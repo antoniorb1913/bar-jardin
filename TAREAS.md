@@ -266,10 +266,10 @@ T0  Documentación
 
 ### T12 · Cálculo de horario con `Intl.DateTimeFormat`
 
-- **Estado:** ⏳ Pendiente
+- **Estado:** 👀 Esperando tu OK
 - **Depende de:** T3
-- **Archivos:** `js/horario.js`
-- **¿Por qué?** El método actual (`toLocaleString("en-US")` + `new Date(...)`) funciona, pero depende de cómo cada navegador interprete ese texto de fecha. `Intl.DateTimeFormat(..., { timeZone: "Europe/Madrid" }).formatToParts()` es la API pensada exactamente para esto: misma lógica, sin conversiones implícitas y sin sorpresas entre navegadores.
+- **Archivos:** `js/horario.js` (nueva `ahoraEnMadrid()` y `FORMATO_MADRID`)
+- **¿Por qué?** El método anterior (`toLocaleString("en-US")` + `new Date(...)`) **construía una fecha a partir de un texto** y dependía de cómo cada navegador interprete ese formato. Ahora se usa `Intl.DateTimeFormat(..., { timeZone: "Europe/Madrid", hourCycle: "h23" }).formatToParts()`, que es la API pensada exactamente para esto: devuelve las partes ya convertidas, sin conversiones implícitas. El día de la semana se calcula con la fecha **ya convertida a Madrid** y en UTC, así que la zona horaria del visitante no influye.
 - **¿Cómo comprobar?** Cambiando la hora del sistema (recordar volver a poner la hora automática después) y recargando:
 
   | Día y hora | Debe mostrar |
@@ -284,6 +284,7 @@ T0  Documentación
   | Lunes 12:00 | Cerrado |
 
   Y con la hora real: el badge coincide con la realidad (última comprobación).
+- **Verificación automática:** 19 casos en Node **inyectando el instante** (sin tocar el reloj): los 12 límites de invierno, 4 de verano y 3 del cambio de hora. Todos correctos, sin regresiones respecto al método anterior.
 
 ### T13 · Imágenes sin salto de layout
 

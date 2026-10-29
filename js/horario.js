@@ -20,14 +20,43 @@ const HORARIOS = {
 
 let isBarOpen = false;
 
-function calcularEstadoBar() {
-  const ahora = new Date();
-  const horaEspanaStr = ahora.toLocaleString("en-US", { timeZone: "Europe/Madrid" });
-  const fechaEspana = new Date(horaEspanaStr);
+/* La hora de Madrid con Intl.DateTimeFormat + formatToParts, que es la API
+   pensada exactamente para esto: devuelve las partes ya convertidas a la zona
+   horaria indicada. El método anterior (toLocaleString + new Date) construía
+   una fecha a partir de un texto y dependía de cómo cada navegador
+   interpretase ese formato. */
+const FORMATO_MADRID = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Europe/Madrid",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23"
+});
 
-  const diaSemana = fechaEspana.getDay();
-  const horas = fechaEspana.getHours();
-  const minutos = fechaEspana.getMinutes();
+/* Día de la semana (0 = domingo) y hora en Madrid, ahora mismo. */
+function ahoraEnMadrid() {
+  const partes = {};
+  for (const parte of FORMATO_MADRID.formatToParts(new Date())) {
+    partes[parte.type] = parte.value;
+  }
+
+  // El día se calcula con la fecha ya convertida a Madrid y en UTC, para que
+  // la zona horaria del visitante no influya en el resultado.
+  const diaSemana = new Date(
+    Date.UTC(Number(partes.year), Number(partes.month) - 1, Number(partes.day))
+  ).getUTCDay();
+
+  return {
+    diaSemana,
+    horas: Number(partes.hour),
+    minutos: Number(partes.minute)
+  };
+}
+
+function calcularEstadoBar() {
+  const { diaSemana, horas, minutos } = ahoraEnMadrid();
   const horaActualDecimal = horas + (minutos / 60);
 
   isBarOpen = false;
