@@ -36,10 +36,10 @@
 | **0** · Documentación | T0 | 1 / 1 |
 | **1** · Estructura | T1 – T3 | 3 / 3 |
 | **2** · Rendimiento y peso | T4 – T7 | 3 / 4 |
-| **3** · Compartir e instalar | T8 – T9 | 0 / 2 |
+| **3** · Compartir e instalar | T8 – T9 | 1 / 2 |
 | **4** · Robustez y accesibilidad | T10 – T13 | 0 / 4 |
 | **5** · Publicación y seguridad | T14 – T15 | 0 / 2 |
-| **TOTAL** | **16 tareas** | **7 / 16** |
+| **TOTAL** | **16 tareas** | **8 / 16** |
 
 ---
 
@@ -47,8 +47,8 @@
 
 | ID | Decisión | Bloquea | Estado |
 |---|---|---|---|
-| **D1** | **Dominio definitivo** (`algo.netlify.app` o dominio propio) | T7 (opción B), T8 | ⏳ Sin decidir |
-| **D2** | **¿Autohospedar las fuentes?** (subir `.woff2` al repo; licencia OFL lo permite) | T5 | ⏳ Sin decidir (recomendado: sí) |
+| **D1** | **Dominio definitivo** | T7 (opción B), T8 | ✅ **RESUELTO (2026-10-29):** `https://bareljardin-bolnuevo.netlify.app/` (subdominio gratuito de Netlify, verificado 200) |
+| **D2** | **¿Autohospedar las fuentes?** (subir `.woff2` al repo; licencia OFL lo permite) | T5 | ⏳ **Sin decidir** (recomendado: sí) |
 
 ---
 
@@ -216,14 +216,16 @@ T0  Documentación
 
 ### T9 · Iconos e instalación en el móvil
 
-- **Estado:** ⏳ Pendiente
+- **Estado:** ✅ Completada (2026-10-29)
 - **Depende de:** T3
-- **Archivos:** `index.html` (`<head>`), `manifest.webmanifest`, `assets/icons/` (favicon 32, apple-touch-icon 180, iconos 192 y 512)
+- **Archivos:** `index.html` (`<head>`), `manifest.webmanifest` (nuevo), `assets/icons/` (favicon-32, favicon-48, apple-touch-icon-180, icon-192, icon-512)
 - **¿Por qué?** Cuando un cliente hace "Añadir a pantalla de inicio", ahora sale una **captura de pantalla** como icono y sin nombre. Con iconos propios y un `manifest` sale el logo del bar con su nombre: parece una app y se reconoce de un vistazo.
 - **¿Cómo comprobar?**
-  1. En Android (Chrome) y iPhone (Safari) → "Añadir a pantalla de inicio": aparece el **logo** y el nombre "El Jardín".
-  2. DevTools → Application → Manifest: sin errores ni avisos.
-  3. La pestaña del navegador muestra el favicon.
+  1. En Android (Chrome) y iPhone (Safari) → "Añadir a pantalla de inicio": aparece el **logotipo** y el nombre "El Jardín".
+  2. DevTools → Application → Manifest: sin errores ni avisos, con los iconos 192 y 512.
+  3. La pestaña del navegador muestra **la palmera** como icono (el logotipo no se lee a 32 px).
+  4. `F12` → Network: los 5 iconos y el manifest responden 200, ninguno da 404.
+  5. La tarjeta en sí **no cambia** en nada.
 
 ---
 

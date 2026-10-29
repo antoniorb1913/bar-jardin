@@ -58,6 +58,7 @@ Se añaden además los metadatos de la tarea: estado, rama, commit, archivos toc
 | T4 | Recortar las fuentes web cargadas | 2026-10-29 | `perf/t4-recorte-fuentes` |
 | T6 | Mover las imágenes a `assets/img/` y optimizar `fondo.webp` | 2026-10-29 | `perf/t6-imagenes` |
 | T7 | Quitar el CDN del QR | 2026-10-29 | `perf/t7-qr-local` |
+| T9 | Iconos e instalación en el móvil | 2026-10-29 | `feat/t9-iconos` |
 
 ---
 
@@ -334,3 +335,37 @@ He descargado la librería del QR (qrcodejs 1.0.0, 19.927 bytes, licencia MIT) y
 6. Consola sin errores.
 
 *Verificación automática:* 9 comprobaciones en Node —la librería se evalúa sin errores, expone `QRCode` y `QRCode.CorrectLevel` con L/M/Q/H (lo que usa `app.js`), sus únicas URLs son namespaces W3C, y el proyecto no referencia el CDN—.
+
+---
+
+## 2026-10-29 · T9 — Iconos e instalación en el móvil
+
+**Estado:** ✅ Completada y verificada por el usuario
+**Rama:** `feat/t9-iconos`
+**Commit:** `feat: añade iconos de instalación y manifest`
+**Archivos:** `index.html`, `manifest.webmanifest` (nuevo), `assets/icons/` (5 iconos nuevos), `TAREAS.md`, `HISTORIAL.md`, `AGENTS.md`
+**Depende de:** T3
+
+### 1. ¿Qué he realizado?
+
+He generado **cinco iconos** a partir del logotipo y de la palmera, he creado `manifest.webmanifest` y he añadido al `<head>` de `index.html` las cuatro etiquetas necesarias (`icon` para 32 y 48 px, `apple-touch-icon` y `manifest`).
+
+### 2. ¿Por qué?
+
+Antes, si un cliente pulsaba «Añadir a pantalla de inicio», el móvil usaba una **captura de pantalla** como icono y no mostraba ningún nombre. Ahora aparece el logotipo, el nombre «El Jardín» y la tarjeta se abre a pantalla completa (`display: standalone`): parece una app y se reconoce de un vistazo.
+
+Detalle de diseño: en la **pestaña** del navegador se usa la **palmera** (el logotipo es muy ancho y a 32 px es ilegible), y para la **pantalla de inicio** el logotipo cuadrado sobre fondo crema, que es el mismo tono del cuerpo de la tarjeta.
+
+### 3. ¿Dónde verlo en el código?
+
+- `manifest.webmanifest` — `name`, `short_name` «El Jardín», `display: standalone`, `background_color`/`theme_color` crema (`#f7f5f0`) e iconos de 192 y 512.
+- `index.html:12-18` — los cuatro `<link>` (dos `icon`, `apple-touch-icon` y `manifest`).
+- `assets/icons/favicon-32.png` (2,0 KB), `favicon-48.png` (3,6 KB), `apple-touch-icon.png` 180×180 (8,1 KB), `icon-192.png` (8,7 KB) e `icon-512.png` (25,2 KB).
+
+### 4. ¿Cómo comprobar que funciona?
+
+1. Abrir `bar-jardin/index.html` con `Ctrl+F5`: la tarjeta se ve idéntica.
+2. La pestaña del navegador muestra **la palmera** como icono.
+3. `F12` → Application → Manifest: sin errores ni avisos, con los iconos 192 y 512 y los colores declarados.
+4. En el móvil, «Añadir a pantalla de inicio»: icono con el logotipo y el nombre «El Jardín».
+5. `F12` → Network: los cinco iconos y el manifest responden 200, ninguno da 404.
