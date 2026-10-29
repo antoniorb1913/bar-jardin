@@ -37,9 +37,9 @@
 | **1** · Estructura | T1 – T3 | 3 / 3 |
 | **2** · Rendimiento y peso | T4 – T7 | 4 / 4 |
 | **3** · Compartir e instalar | T8 – T9 | 2 / 2 |
-| **4** · Robustez y accesibilidad | T10 – T13 | 1 / 4 |
+| **4** · Robustez y accesibilidad | T10 – T13 | 2 / 4 |
 | **5** · Publicación y seguridad | T14 – T15 | 0 / 2 |
-| **TOTAL** | **16 tareas** | **11 / 16** |
+| **TOTAL** | **16 tareas** | **12 / 16** |
 
 ---
 
@@ -251,7 +251,7 @@ T0  Documentación
 
 ### T11 · Accesibilidad: idioma, `aria` y modal
 
-- **Estado:** 👀 Esperando tu OK
+- **Estado:** ✅ Completada (2026-10-29)
 - **Depende de:** T3
 - **Archivos:** `js/i18n.js` (`lang` + `aria-pressed`), `js/app.js` (foco, `Escape`, trampa de foco, bloqueo de scroll), `index.html` (3 `aria-pressed` + toast con `role="status"` y `aria-live`), `css/styles.css` (`body.modal-abierto`)
 - **¿Por qué?** `<html lang="es">` **nunca cambiaba**: al pasar a inglés o alemán, los lectores de pantalla seguían leyendo con fonética española y Google indexaba mal. Además el modal **no se cerraba con `Escape`, no atrapaba el foco y no bloqueaba el scroll** del fondo, y el toast no se anunciaba. Para quien navega con teclado o lector de pantalla, el modal era una trampa.
