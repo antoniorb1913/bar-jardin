@@ -1,0 +1,13 @@
+# El proyecto no tiene dependencias ni build, así que casi no hay nada que
+# ignorar. Se deja preparado por higiene y por si alguna herramienta local
+# genera basura.
+
+node_modules/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+
+# Editores
+.vscode/
+.idea/

@@ -64,6 +64,7 @@ Se añaden además los metadatos de la tarea: estado, rama, commit, archivos toc
 | T10 | Robustez: `localStorage`, portapapeles y `innerHTML` | 2026-10-29 | `fix/t10-robustez` |
 | T11 | Accesibilidad: idioma, `aria` y modal | 2026-10-29 | `feat/t11-accesibilidad` |
 | T12 | Cálculo de horario con `Intl.DateTimeFormat` | 2026-10-29 | `refactor/t12-horario-intl` |
+| T13 | Imágenes sin salto de layout | 2026-10-29 | `perf/t13-imagenes-sin-salto` |
 
 ---
 
@@ -550,3 +551,36 @@ Porque el método anterior **parseaba un texto de fecha**, y cómo se interpreta
 1. `Ctrl+F5`: el badge debe decir **Abierto** si la hora de Madrid está entre las 16:00 y las 23:00 (o las 00:00 los viernes y sábados), y **Cerrado** fuera de ese tramo.
 2. Si se quiere probar un límite: poner la hora del sistema a las 15:59 → *Cerrado*, a las 16:00 → *Abierto*, y volver a activar la hora automática.
 3. *Verificación automática:* **19 casos en Node inyectando el instante** (sin tocar el reloj) — 12 límites en horario de invierno, 4 en verano y 3 alrededor del cambio de hora. Todos correctos.
+
+---
+
+## 2026-10-29 · T13 — Imágenes sin salto de layout
+
+**Estado:** ✅ Completada y verificada por el usuario
+**Rama:** `perf/t13-imagenes-sin-salto`
+**Commit:** `perf: reserva el hueco de las imágenes para evitar saltos de layout`
+**Archivos:** `index.html`, `TAREAS.md`
+**Depende de:** T3
+
+### 1. ¿Qué he realizado?
+
+He añadido `width`, `height` y `decoding="async"` a las tres imágenes de la tarjeta, con **sus dimensiones reales**: 1200×501 el logotipo, 560×846 el fondo y 120×120 la palmera.
+
+### 2. ¿Por qué?
+
+Sin esos atributos el navegador no conoce la proporción de la imagen hasta que llega, así que no puede reservar el hueco. **El caso que importaba de verdad es el logotipo**: su CSS es `width: 100%; height: auto`, de modo que su altura depende de la proporción; sin declararla, la tarjeta reservaba una altura distinta y **daba un salto** al cargar la imagen (más visible en 3G/4G lento). El fondo y la palmera tienen tamaño fijo por CSS (100 %×100 % y 24×24), así que en ellos los atributos son corrección de HTML, no una mejora de layout.
+
+**Detalle importante:** los valores tienen que coincidir con los reales. Si se declarara una proporción distinta, el navegador reservaría un hueco equivocado y el salto sería **peor** que no poner nada. Comprobado con Pillow contra los tres archivos.
+
+### 3. ¿Dónde verlo en el código?
+
+- `index.html:64` — fondo: `width="560" height="846" decoding="async"`.
+- `index.html:135` — logotipo: `width="1200" height="501" decoding="async"`.
+- `index.html:141` — palmera: `width="120" height="120" decoding="async"`.
+
+### 4. ¿Cómo comprobar que funciona?
+
+1. Abrir con `Ctrl+F5`: todo se ve igual (los atributos no cambian el tamaño, solo informan de la proporción).
+2. `F12` → Network → throttling *Slow 3G* → recargar: la tarjeta **no salta**; el hueco del logotipo está reservado.
+3. Lighthouse → CLS por debajo de 0,1 (idealmente 0).
+4. El fondo sigue sin hacer zoom al desplegar los horarios.

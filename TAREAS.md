@@ -37,9 +37,9 @@
 | **1** · Estructura | T1 – T3 | 3 / 3 |
 | **2** · Rendimiento y peso | T4 – T7 | 4 / 4 |
 | **3** · Compartir e instalar | T8 – T9 | 2 / 2 |
-| **4** · Robustez y accesibilidad | T10 – T13 | 3 / 4 |
+| **4** · Robustez y accesibilidad | T10 – T13 | 4 / 4 |
 | **5** · Publicación y seguridad | T14 – T15 | 0 / 2 |
-| **TOTAL** | **16 tareas** | **13 / 16** |
+| **TOTAL** | **16 tareas** | **14 / 16** |
 
 ---
 
@@ -288,7 +288,7 @@ T0  Documentación
 
 ### T13 · Imágenes sin salto de layout
 
-- **Estado:** 👀 Esperando tu OK
+- **Estado:** ✅ Completada (2026-10-29)
 - **Depende de:** T3
 - **Archivos:** `index.html` (las tres etiquetas `<img>`)
 - **¿Por qué?** Sin `width`/`height`, el navegador no sabe cuánto espacio reservar hasta que la imagen llega. **El caso que de verdad importa es el logo**: su CSS es `width: 100%; height: auto`, así que sin la proporción declarada la tarjeta reserva una altura distinta y **salta** al cargar. El fondo y la palmera tienen tamaño fijo por CSS, así que en ellos los atributos son solo corrección (no cambian nada).
@@ -305,17 +305,18 @@ T0  Documentación
 
 ### T14 · Configuración de Netlify y cabeceras de seguridad
 
-- **Estado:** ⏳ Pendiente
+- **Estado:** 👀 Esperando tu OK
 - **Depende de:** **T3, T5 y T7** (si no, la CSP rompe la página)
-- **Archivos:** `netlify.toml`, `_headers`, `robots.txt`, `404.html`, `README.md`, `.gitignore`
-- **¿Por qué?** Aquí es donde se recoge el fruto de todo lo anterior: con el JS y el CSS ya en archivos y sin CDNs, se puede aplicar una **CSP estricta** (`default-src 'self'`, sin `'unsafe-inline'`) que bloquee de verdad cualquier script inyectado. Se añaden `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` (bloquear cámara, micrófono y geolocalización) y `X-Frame-Options`. Y `Cache-Control: immutable` para los assets → visitas repetidas casi instantáneas.
+- **Archivos:** `netlify.toml`, `_headers`, `robots.txt`, `sitemap.xml`, `404.html`, `README.md` y `.gitignore` (todos nuevos o reescritos)
+- **¿Por qué?** Aquí se recoge el fruto de todo lo anterior: con el JS y el CSS en archivos y sin ningún CDN, se puede aplicar una **CSP estricta** (`default-src 'self'`, sin `'unsafe-inline'`) que bloquee de verdad cualquier script inyectado. Además `nosniff`, `Referrer-Policy`, `Permissions-Policy` (bloquear cámara, micrófono y geolocalización), `X-Frame-Options`/`frame-ancestors`, y `Cache-Control: immutable` para los assets, que hace que las visitas repetidas sean casi instantáneas.
 - **¿Cómo comprobar?**
-  1. Tras desplegar: `https://securityheaders.com` → nota **A**.
+  1. **En local** no se puede probar (las cabeceras las pone Netlify al servir). Se comprueba **después de desplegar**: `https://securityheaders.com` → nota **A**.
   2. DevTools → Network → cabeceras de `index.html`: la CSP aparece. En `css/styles.css`: `cache-control: public, max-age=31536000, immutable`.
-  3. Consola **sin violaciones de CSP** (si hay alguna, es un fallo de esta tarea).
+  3. Consola **sin violaciones de CSP** (si aparece alguna, es un fallo de esta tarea).
   4. Una URL inventada (`/loquesea`) muestra la **404 propia**, con el estilo de la tarjeta.
-  5. `/robots.txt` responde.
+  5. `/robots.txt` y `/sitemap.xml` responden.
   6. El sitio sigue funcionando exactamente igual que antes.
+- *Verificación local hecha:* la CSP cubre **todos** los recursos que carga la página (4 scripts, 1 hoja de estilos, 3 imágenes, 2 fuentes, y `data:` para el QR del canvas); nuestro código no tiene `eval`, ni `new Function`, ni estilos en línea, y la librería del QR tampoco.
 
 ### T15 · Verificación final integral
 

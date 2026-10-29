@@ -1,0 +1,16 @@
+# Netlify — Tarjeta digital del Bar El Jardín (Bolnuevo)
+#
+# Sitio estático SIN build: se publica la raíz del repositorio tal cual.
+# Las cabeceras de seguridad y de caché están en el archivo `_headers`.
+
+[build]
+  publish = "."
+
+# Si algún día se cambia de dominio, aquí se añadiría el redirect permanente
+# para no romper los QR ya impresos:
+#
+# [[redirects]]
+#   from = "https://dominio-viejo.example/*"
+#   to = "https://bareljardin-bolnuevo.netlify.app/:splat"
+#   status = 301
+#   force = true
