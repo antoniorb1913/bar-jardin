@@ -295,10 +295,12 @@ Sin instalar nada (todo es relativo y no hay backend):
 
 ## 13. Decisiones pendientes del usuario
 
-| ID | Decisión | Bloquea | Recomendación |
+| ID | Decisión | Bloquea | Estado |
 |---|---|---|---|
-| **D1** | **Dominio definitivo**: ¿`algo.netlify.app` o dominio propio (`bareljardin.es`…)? | T7 (opción QR estático), T8 (metadatos sociales y `canonical`) — y **los QR que se impriman** | Decidirlo ya: un QR impreso fija la URL para siempre |
-| **D2** | ¿Se autohospedan las fuentes? Implica subir `.woff2` al repo (licencia OFL, permitido) | T5 | Sí: mismo render, menos peso y evita enviar la IP del visitante a Google (RGPD) |
+| **D1** | **Dominio definitivo** | T7 (opción QR estático), T8 (metadatos sociales y `canonical`) — y **los QR que se impriman** | ✅ **RESUELTO (2026-10-29): `https://bareljardin-bolnuevo.netlify.app/`** — subdominio gratuito de Netlify, sin dominio propio. Verificado: responde 200. **Ojo:** un QR impreso fijaría esta dirección; si algún día se pasa a dominio propio, los QR ya impresos dejarían de funcionar. |
+| **D2** | ¿Se autohospedan las fuentes? Implica subir `.woff2` al repo (licencia OFL, permitido) | T5 | ⏳ **Pendiente.** No he recibido respuesta todavía. |
+
+> **URL canónica del proyecto:** `https://bareljardin-bolnuevo.netlify.app/`. Es la que deben usar `og:url`, `og:image` (absoluta), `canonical` y la URL del QR.
 
 ---
 
@@ -321,3 +323,4 @@ Sin instalar nada (todo es relativo y no hay backend):
 |---|---|
 | 2026-10-29 | Versión inicial. Ficha del proyecto, 5 reglas del usuario, flujo obligatorio, stack, estructura, contrato de no regresión y convenciones. |
 | 2026-10-29 | Añadida la **REGLA 6** (§7.1): al recibir «¿Todo OK?» → «sí», comprobar que todo está bien subido e informar de lo que falte. Corregidas las medidas reales del CSS (18,1 KB) y del JS (11,5 KB). |
+| 2026-10-29 | **D1 resuelto:** URL canónica `https://bareljardin-bolnuevo.netlify.app/`. Actualizada la tabla de decisiones (§13). Añadida la nota de que Netlify todavía **no** está conectado al repo. |
