@@ -69,12 +69,36 @@ const TRANSLATIONS = {
   }
 };
 
+/* Almacenamiento a prueba de bloqueos.
+   localStorage lanza una excepción si el navegador lo tiene bloqueado (modo
+   privado de Safari, cookies bloqueadas, navegadores dentro de apps como
+   Instagram). Sin este try/catch, la excepción en la primera línea mataba
+   todo el script: la tarjeta se quedaba en "Consultando..." para siempre,
+   sin QR y sin desplegable. Si falla, se usa español y no se recuerda el
+   idioma, pero todo lo demás funciona. */
+const ALMACEN = {
+  leer(clave) {
+    try {
+      return localStorage.getItem(clave);
+    } catch {
+      return null;
+    }
+  },
+  guardar(clave, valor) {
+    try {
+      localStorage.setItem(clave, valor);
+    } catch {
+      /* sin persistencia: la tarjeta funciona igual */
+    }
+  }
+};
+
 // Idioma recordado del visitante. Si no hay nada guardado, español.
-let currentLang = localStorage.getItem("bareljardin_lang") || "es";
+let currentLang = ALMACEN.leer("bareljardin_lang") || "es";
 
 function changeLanguage(lang) {
   currentLang = lang;
-  localStorage.setItem("bareljardin_lang", lang);
+  ALMACEN.guardar("bareljardin_lang", lang);
 
   // Actualizar estilos activos de las banderas
   ['es', 'en', 'de'].forEach(l => {
@@ -94,7 +118,7 @@ function changeLanguage(lang) {
   document.getElementById("txt-timeSunThu").textContent = t.timeSunThu;
   document.getElementById("txt-timeFriSat").textContent = t.timeFriSat;
   document.getElementById("txt-locationDesc").textContent = t.locationDesc;
-  document.getElementById("txt-footer").innerHTML = t.footer;
+  document.getElementById("txt-footer").textContent = t.footer;
   document.getElementById("txt-qrDesc").textContent = t.qrDesc;
   document.getElementById("txt-qrClose").textContent = t.qrClose;
 
