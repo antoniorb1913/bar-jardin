@@ -147,10 +147,10 @@ T0  Documentación
 
 ### T4 · Recortar las fuentes web cargadas
 
-- **Estado:** ⏳ Pendiente
+- **Estado:** 👀 Esperando tu OK
 - **Depende de:** T3
-- **Archivos:** `index.html` (línea 16, el `<link>` de Google Fonts)
-- **¿Por qué?** Se pide **Playfair Display**, que **no se usa en ninguna regla del CSS** (descarga desperdiciada). Y de **Cinzel** se piden 3 pesos (600, 700, 900) cuando solo se usa **una vez**, en el título del modal QR, a **900**. Las fuentes son hoy la descarga más pesada del sitio: más que el HTML, el CSS, el JS y las imágenes juntos.
+- **Archivos:** `index.html` (línea 16, el `<link>` de Google Fonts) y `.gitattributes` (nuevo, para normalizar finales de línea)
+- **¿Por qué?** Se piden 3 familias y 9 pesos, pero **Playfair Display no se usa en ninguna regla del CSS** y de **Cinzel** solo se aplica el **900** (el título del modal QR). *(Corrección: el navegador no descarga los pesos que no se aplican, así que el ahorro real es pequeño; es sobre todo **corrección** — pedir solo lo que se usa — y deja limpia la auditoría de fuentes de T5.)*
 - **¿Cómo comprobar?**
   1. El `<link>` queda solo con `Cinzel:wght@900` e `Inter:wght@400;500;600;700;800`.
   2. DevTools → Network → filtrar `font`: ya no aparece ninguna fuente `Playfair`.
