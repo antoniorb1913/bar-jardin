@@ -30,7 +30,7 @@ Versión original en `SUBIR-A-NETLIFY/`:
 
 | Archivo | Peso | Observaciones |
 |---|---|---|
-| `index.html` | 44,8 KB / 1.343 líneas | CSS (~23 KB) y JS (~9 KB) **inline** |
+| `index.html` | 43,8 KB / 1.343 líneas | CSS 18,1 KB y JS 11,5 KB **inline** |
 | `fondo.webp` | 103 KB | 800×1209 px, se usa a `opacity: .14` |
 | `logo.png` | 17,2 KB | 1200×501 px |
 | `palmera.png` | 2,2 KB | 120×120 px |

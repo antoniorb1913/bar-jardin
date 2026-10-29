@@ -52,6 +52,7 @@ Se añaden además los metadatos de la tarea: estado, rama, commit, archivos toc
 | # | Tarea | Fecha | Rama |
 |---|---|---|---|
 | T0 | Documentación y contrato de trabajo | 2026-10-29 | `docs/t0-documentacion-base` |
+| T1 | Migrar el proyecto a `bar-jardin` (copia literal) | 2026-10-29 | `chore/t1-copia-proyecto` |
 
 ---
 
@@ -66,7 +67,7 @@ Se añaden además los metadatos de la tarea: estado, rama, commit, archivos toc
 **Estado:** ✅ Completada y verificada por el usuario
 **Rama:** `docs/t0-documentacion-base`
 **Commit:** `docs: añade AGENTS.md, TAREAS.md e HISTORIAL.md`
-**Archivos:** `bar-jardin/AGENTS.md`, `bar-jardin/TAREAS.md`, `bar-jardin/HISTORIAL.md`, `AGENTS.md` (raíz)
+**Archivos:** `AGENTS.md`, `TAREAS.md`, `HISTORIAL.md` *(el `AGENTS.md` de la raíz del workspace no se versiona: está fuera del repo)*
 **Depende de:** —
 
 ### 1. ¿Qué he realizado?
@@ -103,3 +104,36 @@ No se modificó ningún archivo del sitio: `SUBIR-A-NETLIFY/index.html` conserva
 3. `TAREAS.md` lista las 16 tareas agrupadas por fases y con sus dependencias.
 4. `HISTORIAL.md` contiene la plantilla con los 4 puntos.
 5. No hay ningún archivo nuevo fuera de `bar-jardin/` salvo el `AGENTS.md` de la raíz, y `SUBIR-A-NETLIFY/` sigue intacta.
+
+---
+
+## 2026-10-29 · T1 — Migrar el proyecto a `bar-jardin` (copia literal)
+
+**Estado:** ✅ Completada y verificada por el usuario
+**Rama:** `chore/t1-copia-proyecto`
+**Commit:** `chore: migra el proyecto a bar-jardin como copia literal`
+**Archivos:** `index.html`, `logo.png`, `palmera.png`, `fondo.webp`
+**Depende de:** T0
+
+### 1. ¿Qué he realizado?
+
+He copiado el sitio completo — `index.html`, `logo.png`, `palmera.png` y `fondo.webp` — desde `SUBIR-A-NETLIFY/` a la raíz de `bar-jardin/`, **sin modificar nada**: ni una línea, ni un píxel. `bar-jardin/` pasa a ser la única copia del proyecto que se versiona y la que se publicará en Netlify.
+
+### 2. ¿Por qué?
+
+Porque había tres copias del proyecto (raíz del workspace, `SUBIR-A-NETLIFY/` y el `.zip`) y ninguna era "la buena": cualquier cambio podía acabar en el archivo equivocado y desplegarse otro distinto. Ahora el repo tiene una única fuente de verdad y `SUBIR-A-NETLIFY/` queda como respaldo de solo lectura hasta la verificación final (T15).
+
+### 3. ¿Dónde verlo en el código?
+
+- `index.html` — copia íntegra del original (1.343 líneas, 44.833 bytes). Todavía lleva el CSS y el JS **inline**: se separan en T2 y T3.
+- `logo.png`, `palmera.png` y `fondo.webp` — en la raíz del repo. Se moverán a `assets/img/` en T6.
+- No hay cambios de código: el HTML sigue pidiendo `logo.png`, `palmera.png` y `fondo.webp` con rutas relativas.
+
+### 4. ¿Cómo comprobar que funciona?
+
+1. Abrir `bar-jardin/index.html` con doble clic: la tarjeta se ve igual que la desplegada.
+2. Comprobar las tres imágenes: logo arriba, palmera en el separador y el fondo tenue al 14 %.
+3. Cambiar a inglés y a alemán; abrir «Ver Horarios y Ubicación» y el modal QR.
+4. Consola del navegador (`F12`): sin errores en rojo.
+5. `git ls-files` dentro de `bar-jardin/` lista los 8 archivos del repo (los 4 del sitio + los 3 `.md` + `README.md`).
+6. Comprobación byte a byte: `Get-FileHash` de `index.html`, `logo.png`, `palmera.png` y `fondo.webp` coincide con el de `SUBIR-A-NETLIFY/`.
