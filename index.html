@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bar El Jardín - Bolnuevo</title>
+
+  <!-- Metadatos para previsualización en WhatsApp y Redes Sociales -->
+  <meta property="og:title" content="Bar El Jardín - Bolnuevo">
+  <meta property="og:description" content="Un paraíso en Bolnuevo. Horarios, opiniones, ubicación y contacto.">
+  <meta property="og:image" content="logo.png">
+  <link rel="icon" type="image/png" href="logo.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+
+  <!-- QRCode.js para generar QR al vuelo (defer: no bloquea el dibujado) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+
+  <style>
+    /* ==========================================================================
+       CSS PROPIO - sustituye al CDN de Tailwind
+       Mismo diseño y mismos valores que las utilidades que se usaban, pero
+       sin descargar nada: la tarjeta no depende de ningún CDN para verse bien.
+       ========================================================================== */
+
+    :root {
+      --stone-50: #fafaf9;
+      --stone-100: #f5f5f4;
+      --stone-200: #e7e5e4;
+      --stone-400: #a8a29e;
+      --stone-500: #78716c;
+      --stone-600: #57534e;
+      --stone-700: #44403c;
+      --stone-800: #292524;
+      --stone-900: #1c1917;
+      --amber-50: #fffbeb;
+      --amber-100: #fef3c7;
+      --amber-200: #fde68a;
+      --amber-400: #fbbf24;
+      --amber-500: #f59e0b;
+      --amber-600: #d97706;
+      --amber-900: #78350f;
+      --rose-600: #e11d48;
+      --emerald-600: #059669;
+      --blue-50: #eff6ff;
+      --blue-400: #60a5fa;
+      --blue-600: #2563eb;
+      --pink-50: #fdf2f8;
+      --pink-400: #f472b6;
+      --pink-500: #ec4899;
+      --pink-600: #db2777;
+      --purple-600: #9333ea;
+    }
+
+    /* ---------- Base ---------- */
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html { height: 100%; }
+
+    body {
+      margin: 0;
+      padding: 0 8px;
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      color: var(--stone-900);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      /* Textura de fondo del body */
+      background-color: #f7f5f0;
+      background-image: radial-gradient(#e5ded2 0.75px, transparent 0.75px);
+      background-size: 16px 16px;
+    }
+
+    @media (min-width: 640px) {
+      body { padding: 24px 16px; }
+    }
+
+    ::selection { background: var(--amber-100); color: var(--amber-900); }
+
+    h1, h2, h3, p { margin: 0; }
+    img, svg { display: block; }
+    img { max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+
+    button {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .hidden { display: none !important; }
+
+    /* ---------- Tarjeta ---------- */
+    .card {
+      position: relative;
+      width: 100%;
+      max-width: 32rem;
+      margin: auto;
+      background: #fff;
+      border: 1px solid rgba(231, 229, 228, .9);
+      border-radius: 1rem;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, .12);
+      overflow: hidden;
+    }
+
+    @media (min-width: 640px) {
+      .card { border-radius: 1.5rem; }
+    }
+
+    /* Capa de fondo: su altura la fija el JS (congelarFondo) para que la
+       imagen no se reescale al desplegar el horario. */
+    .bg-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+      -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 90px), transparent 100%);
+      mask-image: linear-gradient(to bottom, #000 calc(100% - 90px), transparent 100%);
+    }
+
+    .bg-layer img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: right bottom;
+      opacity: .14;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .card-inner { position: relative; z-index: 10; }
+
+    /* ---------- Cabecera ---------- */
+    .card-header {
+      position: relative;
+      padding: 16px 16px 12px;
+      text-align: center;
+      background: linear-gradient(to bottom, rgba(255, 255, 255, .95), rgba(255, 255, 255, .8), transparent);
+    }
+
+    @media (min-width: 640px) {
+      .card-header { padding-left: 24px; padding-right: 24px; }
+    }
+
+    /* Barra superior: banderas + acciones */
+    .topbar {
+      position: relative;
+      z-index: 20;
+      width: 100%;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .langs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px;
+      background: rgba(255, 255, 255, .95);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(231, 229, 228, .9);
+      border-radius: 9999px;
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .05);
+    }
+
+    .lang-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 9999px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: .5;
+      transition: opacity .2s, transform .2s, box-shadow .2s;
+    }
+
+    .lang-btn svg { width: 100%; height: 100%; }
+
+    .lang-btn:hover { opacity: .9; }
+
+    .lang-btn.is-active {
+      opacity: 1;
+      transform: scale(1.05);
+      box-shadow: 0 0 0 2px var(--amber-500), 0 1px 2px 0 rgba(0, 0, 0, .05);
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 9999px;
+      border: 1px solid rgba(231, 229, 228, .9);
+      background: rgba(255, 255, 255, .95);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      color: var(--stone-700);
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .05);
+      transition: background-color .2s, transform .2s, color .2s;
+    }
+
+    .icon-btn svg { width: 14px; height: 14px; }
+
+    .icon-btn:hover { background: var(--stone-100); }
+
+    .icon-btn:active { transform: scale(.9); }
+
+    .icon-btn--qr {
+      background: var(--amber-500);
+      border: 0;
+      color: #fff;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .1), 0 1px 2px -1px rgba(0, 0, 0, .1);
+    }
+
+    .icon-btn--qr:hover { background: var(--amber-600); }
+
+    /* Marca: logo + separador + slogan */
+    .brand {
+      padding-top: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .logo-wrap {
+      width: 100%;
+      max-width: 360px;
+      padding: 0 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo {
+      width: 100%;
+      height: auto;
+      max-height: 12rem;
+      object-fit: contain;
+      filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .05));
+    }
+
+    .divider {
+      width: 100%;
+      margin-top: -4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .divider-line {
+      width: 7rem;
+      height: 1.5px;
+      background: linear-gradient(to right, transparent, var(--amber-400), transparent);
+    }
+
+    .palm {
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+    }
+
+    .slogan {
+      margin-top: 4px;
+      color: var(--stone-800);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .05));
+    }
+
+    /* Badge de estado */
+    .status-wrap {
+      margin-top: 24px;
+      margin-bottom: 12px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 24px;
+      border-radius: 9999px;
+      background: var(--rose-600);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -2px rgba(0, 0, 0, .1);
+      transition: background-color .3s;
+    }
+
+    .status-badge.is-open { background: var(--emerald-600); }
+
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 9999px;
+      background: #fff;
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .05);
+    }
+
+    .status-text {
+      font-size: 12px;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    @media (min-width: 640px) {
+      .status-text { font-size: 14px; }
+    }
+
+    /* ---------- Botonera ---------- */
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 12px 16px 16px;
+    }
+
+    @media (min-width: 640px) {
+      .actions { padding: 24px; }
+    }
+
+    .hours-btn {
+      width: 100%;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid rgba(253, 230, 138, .8);
+      border-radius: 1rem;
+      background: rgba(255, 251, 235, .9);
+      color: var(--amber-900);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .05);
+      transition: background-color .2s, transform .2s;
+    }
+
+    .hours-btn:hover { background: rgba(254, 243, 199, .9); }
+
+    .hours-btn:active { transform: scale(.95); }
+
+    .hours-btn-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chevron {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      transition: transform .2s;
+    }
+
+    .chevron.is-open { transform: rotate(180deg); }
+
+    .drawer {
+      margin-top: 12px;
+      padding: 16px;
+      background: rgba(255, 255, 255, .95);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(253, 230, 138, .8);
+      border-radius: 1rem;
+      color: var(--stone-800);
+      font-size: 14px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -2px rgba(0, 0, 0, .1);
+    }
+
+    .drawer > * + * { margin-top: 12px; }
+
+    .drawer-title {
+      margin-bottom: 6px;
+      color: var(--amber-900);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    .hours-box {
+      padding: 10px;
+      background: rgba(255, 251, 235, .8);
+      border: 1px solid rgba(253, 230, 138, .5);
+      border-radius: .75rem;
+      color: var(--stone-700);
+      font-size: 12px;
+    }
+
+    .hours-box > * + * { margin-top: 6px; }
+
+    .hours-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .hours-day {
+      color: var(--stone-800);
+      font-weight: 700;
+    }
+
+    .hours-time {
+      flex-shrink: 0;
+      padding: 2px 8px;
+      background: rgba(253, 230, 138, .7);
+      border-radius: .375rem;
+      color: var(--amber-900);
+      font-weight: 800;
+    }
+
+    .location {
+      padding-top: 8px;
+      border-top: 1px solid var(--stone-200);
+    }
+
+    .location-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--stone-900);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .location-desc {
+      margin-top: 2px;
+      color: var(--stone-600);
+      font-size: 11px;
+      font-weight: 500;
+      line-height: 1.625;
+    }
+
+    /* ---------- Filas de enlace ---------- */
+    .link-row {
+      width: 100%;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid rgba(231, 229, 228, .9);
+      border-radius: 1rem;
+      background: rgba(255, 255, 255, .95);
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .05);
+      transition: border-color .2s, background-color .2s, transform .2s;
+    }
+
+    .link-row:active { transform: scale(.95); }
+
+    .link-row-inner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .link-icon {
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: .75rem;
+      background: var(--amber-100);
+      color: var(--amber-600);
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .05);
+      transition: background-color .15s, color .15s;
+    }
+
+    .link-icon svg { width: 20px; height: 20px; }
+
+    .link-text {
+      min-width: 0;
+      text-align: left;
+    }
+
+    .link-title {
+      color: var(--stone-800);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    .link-title-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .link-sub {
+      color: var(--stone-600);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .link-sub--clip {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .rating {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      padding: 0 6px;
+      background: var(--amber-100);
+      border: 1px solid var(--amber-200);
+      border-radius: .375rem;
+      color: var(--amber-900);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .rating-star {
+      color: var(--amber-500);
+      font-size: 10px;
+    }
+
+    .link-arrow {
+      flex-shrink: 0;
+      color: var(--stone-400);
+      transition: transform .2s, color .2s;
+    }
+
+    .link-arrow svg { width: 20px; height: 20px; }
+
+    /* Maps y reseñas */
+    .link-row--maps:hover,
+    .link-row--reviews:hover {
+      border-color: var(--amber-400);
+      background: rgba(255, 251, 235, .7);
+    }
+
+    .link-row--maps:hover .link-icon {
+      background: var(--amber-500);
+      color: #fff;
+    }
+
+    .link-row--reviews:hover .link-icon { background: var(--amber-100); }
+
+    .link-row--maps:hover .link-arrow,
+    .link-row--reviews:hover .link-arrow {
+      transform: translateX(4px);
+      color: var(--amber-600);
+    }
+
+    .link-icon--reviews {
+      background: var(--stone-100);
+      box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, .05);
+    }
+
+    /* Instagram */
+    .link-row--instagram:hover {
+      border-color: var(--pink-400);
+      background: rgba(253, 242, 248, .7);
+    }
+
+    .link-row--instagram:hover .link-arrow {
+      transform: translateX(4px);
+      color: var(--pink-600);
+    }
+
+    .link-icon--instagram {
+      background: linear-gradient(to top right, var(--amber-400), var(--pink-500), var(--purple-600));
+      color: #fff;
+    }
+
+    /* Facebook */
+    .link-row--facebook:hover {
+      border-color: var(--blue-400);
+      background: rgba(239, 246, 255, .7);
+    }
+
+    .link-row--facebook:hover .link-arrow {
+      transform: translateX(4px);
+      color: var(--blue-600);
+    }
+
+    .link-icon--facebook {
+      background: var(--blue-600);
+      color: #fff;
+    }
+
+    /* ---------- Pie ---------- */
+    .footer {
+      padding: 16px;
+      text-align: center;
+      background: rgba(255, 255, 255, .9);
+      border-top: 1px solid var(--stone-100);
+    }
+
+    .footer-text {
+      color: var(--stone-500);
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    /* ---------- Modal QR ---------- */
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: rgba(28, 25, 23, .6);
+      -webkit-backdrop-filter: blur(4px);
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-panel {
+      position: relative;
+      width: 100%;
+      max-width: 20rem;
+      padding: 24px;
+      text-align: center;
+      background: #fff;
+      border: 1px solid var(--stone-200);
+      border-radius: 1.5rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .25);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 9999px;
+      background: var(--stone-100);
+      color: var(--stone-500);
+      font-size: 16px;
+      line-height: 1;
+      transition: background-color .15s;
+    }
+
+    .modal-close:hover { background: var(--stone-200); }
+
+    .modal-title {
+      color: var(--amber-500);
+      font-family: "Cinzel", serif;
+      font-size: 1.25rem;
+      font-weight: 900;
+    }
+
+    .modal-desc {
+      margin: 4px 0 16px;
+      color: var(--stone-500);
+      font-size: 12px;
+    }
+
+    .qr-box {
+      display: inline-block;
+      padding: 12px;
+      background: var(--stone-50);
+      border: 1px solid var(--stone-200);
+      border-radius: 1rem;
+      box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, .05);
+    }
+
+    #qrcodeCanvas {
+      display: flex;
+      justify-content: center;
+    }
+
+    .modal-footer {
+      margin-top: 16px;
+      padding-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border-top: 1px solid var(--stone-100);
+    }
+
+    .btn-dark {
+      width: 100%;
+      padding: 8px 0;
+      border-radius: .75rem;
+      background: var(--stone-800);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      transition: background-color .15s;
+    }
+
+    .btn-dark:hover { background: var(--stone-900); }
+
+    /* ---------- Toast ---------- */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      z-index: 50;
+      padding: 8px 16px;
+      border-radius: 9999px;
+      background: var(--stone-900);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 500;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -4px rgba(0, 0, 0, .1);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s;
+    }
+
+    .toast.is-visible { opacity: 1; }
+
+    /* ---------- Animaciones ---------- */
+    @keyframes slideUpFade {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .anim-1 { animation: slideUpFade .5s cubic-bezier(.16, 1, .3, 1) both; }
+    .anim-2 { animation: slideUpFade .5s cubic-bezier(.16, 1, .3, 1) .08s both; }
+    .anim-3 { animation: slideUpFade .5s cubic-bezier(.16, 1, .3, 1) .16s both; }
+    .anim-4 { animation: slideUpFade .5s cubic-bezier(.16, 1, .3, 1) .24s both; }
+
+    @keyframes subtleFloat {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50%      { transform: translateY(-3px) scale(1.01); }
+    }
+
+    .logo-subtle {
+      will-change: transform;
+      animation: subtleFloat 5s ease-in-out infinite;
+    }
+
+    @keyframes calmPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: .4; transform: scale(.85); }
+    }
+
+    .calm-blink { animation: calmPulse 2s ease-in-out infinite; }
+
+    /* Respeta a quien tenga reducidas las animaciones del sistema */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .001ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Tarjeta Central Adaptada a Cualquier Pantalla -->
+  <main class="card anim-1">
+
+    <!-- IMAGEN DE FONDO (fondo.webp) - altura congelada: no hace zoom al desplegar -->
+    <div id="bgLayer" class="bg-layer">
+      <img src="fondo.webp" alt="" aria-hidden="true">
+    </div>
+
+    <!-- Contenido en capa superior -->
+    <div class="card-inner">
+
+      <!-- Cabecera -->
+      <header class="card-header">
+
+        <!-- Barra de herramientas superior -->
+        <div class="topbar">
+
+          <!-- Selector de Banderas Gráficas en SVG -->
+          <div class="langs">
+
+            <!-- Bandera España -->
+            <button onclick="changeLanguage('es')" id="btn-es" title="Español" aria-label="Español" class="lang-btn is-active">
+              <svg viewBox="0 0 512 512" aria-hidden="true">
+                <circle cx="256" cy="256" r="256" fill="#c60b1e"/>
+                <path d="M0 160h512v192H0z" fill="#ffc400"/>
+              </svg>
+            </button>
+
+            <!-- Bandera Reino Unido (Inglés) -->
+            <button onclick="changeLanguage('en')" id="btn-en" title="English" aria-label="English" class="lang-btn">
+              <svg viewBox="0 0 512 512" aria-hidden="true">
+                <clipPath id="circle-gb"><circle cx="256" cy="256" r="256"/></clipPath>
+                <g clip-path="url(#circle-gb)">
+                  <path fill="#012169" d="M0 0h512v512H0z"/>
+                  <path stroke="#fff" stroke-width="60" d="M0 0l512 512M512 0L0 512"/>
+                  <path stroke="#c8102e" stroke-width="35" d="M0 0l512 512M512 0L0 512"/>
+                  <path stroke="#fff" stroke-width="95" d="M256 0v512M0 256h512"/>
+                  <path stroke="#c8102e" stroke-width="58" d="M256 0v512M0 256h512"/>
+                </g>
+              </svg>
+            </button>
+
+            <!-- Bandera Alemania (Alemán) -->
+            <button onclick="changeLanguage('de')" id="btn-de" title="Deutsch" aria-label="Deutsch" class="lang-btn">
+              <svg viewBox="0 0 512 512" aria-hidden="true">
+                <clipPath id="circle-de"><circle cx="256" cy="256" r="256"/></clipPath>
+                <g clip-path="url(#circle-de)">
+                  <path fill="#000" d="M0 0h512v170.7H0z"/>
+                  <path fill="#dd0000" d="M0 170.7h512v170.6H0z"/>
+                  <path fill="#ffce00" d="M0 341.3h512V512H0z"/>
+                </g>
+              </svg>
+            </button>
+
+          </div>
+
+          <!-- Acciones Superiores: Copiar enlace y QR -->
+          <div class="topbar-actions">
+            <button id="copyBtn" onclick="copyCardLink()" aria-label="Copiar enlace" title="Copiar enlace" class="icon-btn">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+              </svg>
+            </button>
+            <button onclick="openQrModal()" aria-label="Mostrar Código QR" title="Mostrar código QR" class="icon-btn icon-btn--qr">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+              </svg>
+            </button>
+          </div>
+
+        </div>
+
+        <div class="brand anim-2">
+
+          <!-- LOGO DEL BAR -->
+          <div class="logo-wrap">
+            <img src="logo.png" alt="Bar El Jardín" class="logo logo-subtle">
+          </div>
+
+          <!-- Separador con palmera.png -->
+          <div class="divider">
+            <div class="divider-line"></div>
+            <img src="palmera.png" alt="Palmera" class="palm">
+            <div class="divider-line"></div>
+          </div>
+
+          <!-- Slogan traducible -->
+          <p id="txt-slogan" class="slogan">
+            Un paraíso en Bolnuevo
+          </p>
+
+          <!-- BADGE DE ESTADO -->
+          <div class="status-wrap anim-3">
+            <span id="badgeEstado" class="status-badge">
+              <span id="badgeDot" class="status-dot calm-blink"></span>
+              <span id="badgeTexto" class="status-text">Consultando...</span>
+            </span>
+          </div>
+
+        </div>
+      </header>
+
+      <!-- Botonera -->
+      <div class="actions anim-4">
+
+        <!-- 1. Desplegable Horarios y Ubicación -->
+        <div>
+          <button id="btnSchedule" onclick="toggleInfoSection()" aria-expanded="false" aria-controls="infoDrawer" class="hours-btn">
+            <span class="hours-btn-label">
+              <span aria-hidden="true">🕒</span> <span id="txt-btnSchedule">Ver Horarios y Ubicación</span>
+            </span>
+            <svg id="chevronIcon" class="chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+
+          <div id="infoDrawer" class="drawer hidden">
+            <div>
+              <p id="txt-titleSchedule" class="drawer-title">🕒 Horario de Apertura</p>
+              <div class="hours-box">
+                <div class="hours-row">
+                  <span id="txt-daysSunThu" class="hours-day">Domingo a Jueves:</span>
+                  <span id="txt-timeSunThu" class="hours-time">16:00 - 23:00</span>
+                </div>
+                <div class="hours-row">
+                  <span id="txt-daysFriSat" class="hours-day">Viernes y Sábados:</span>
+                  <span id="txt-timeFriSat" class="hours-time">16:00 - 00:00</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="location">
+              <p class="location-title">
+                <span aria-hidden="true">🏛️</span> Urbanización Playasol 2
+              </p>
+              <p id="txt-locationDesc" class="location-desc">
+                Cerca del Cámping Bolnuevo, Iglesia y acceso desde el Puerto. CP: 30877 Bolnuevo (Mazarrón).
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botón Google Maps -->
+        <a href="https://www.google.com/maps/search/?api=1&query=Avda.+Antonio+Segado+del+Olmo,+19,+30877+Bolnuevo,+Murcia" target="_blank" rel="noopener noreferrer" class="link-row link-row--maps">
+          <div class="link-row-inner">
+            <div class="link-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+            </div>
+            <div class="link-text">
+              <h3 id="txt-howToGet" class="link-title">¿Cómo llegar?</h3>
+              <p class="link-sub link-sub--clip">Avda. Antonio Segado del Olmo, 19 - Bolnuevo</p>
+            </div>
+          </div>
+          <span class="link-arrow">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </span>
+        </a>
+
+        <!-- Botón Ver Reseñas en Google -->
+        <a href="https://g.page/r/CeTRGcAkbFDlEAE" target="_blank" rel="noopener noreferrer" class="link-row link-row--reviews">
+          <div class="link-row-inner">
+            <div class="link-icon link-icon--reviews">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+                <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+              </svg>
+            </div>
+            <div class="link-text">
+              <div class="link-title-row">
+                <h3 id="txt-reviewTitle" class="link-title">Opiniones en Google</h3>
+                <span class="rating">
+                  4.5 <span class="rating-star">★</span>
+                </span>
+              </div>
+              <p id="txt-reviewDesc" class="link-sub link-sub--clip">Ver reseñas y fotos del bar</p>
+            </div>
+          </div>
+          <span class="link-arrow">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </span>
+        </a>
+
+        <!-- Botón Instagram -->
+        <a href="https://instagram.com/clubbareljardin" target="_blank" rel="noopener noreferrer" class="link-row link-row--instagram">
+          <div class="link-row-inner">
+            <div class="link-icon link-icon--instagram">
+              <svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+              </svg>
+            </div>
+            <div class="link-text">
+              <h3 class="link-title">Instagram</h3>
+              <p class="link-sub">@clubbareljardin</p>
+            </div>
+          </div>
+          <span class="link-arrow">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </span>
+        </a>
+
+        <!-- Botón Facebook con el perfil de Fran Fran -->
+        <a href="https://www.facebook.com/profile.php?id=100009549083892" target="_blank" rel="noopener noreferrer" class="link-row link-row--facebook">
+          <div class="link-row-inner">
+            <div class="link-icon link-icon--facebook">
+              <svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M9 8H6v4h3v12h5V12h3.642L18 8h-4V6.333C14 5.374 14.5 5 15.667 5H18V0h-3.808C10.592 0 9 1.583 9 4.615V8z"/>
+              </svg>
+            </div>
+            <div class="link-text">
+              <h3 class="link-title">Facebook</h3>
+              <p class="link-sub">Fran fran</p>
+            </div>
+          </div>
+          <span class="link-arrow">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </span>
+        </a>
+
+      </div>
+
+      <footer class="footer">
+        <p id="txt-footer" class="footer-text">
+          Bar El Jardín • Bolnuevo • Tarjeta Digital Interactiva
+        </p>
+      </footer>
+    </div>
+  </main>
+
+  <!-- Modal Emergente QR -->
+  <div id="qrModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="qrModalTitle">
+    <div class="modal-panel">
+      <button onclick="closeQrModal()" aria-label="Cerrar modal" class="modal-close">
+        ✕
+      </button>
+
+      <span id="qrModalTitle" class="modal-title">BAR EL JARDÍN</span>
+      <p id="txt-qrDesc" class="modal-desc">Escanea con la cámara del móvil para abrir la tarjeta</p>
+
+      <div class="qr-box">
+        <div id="qrcodeCanvas"></div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="txt-qrClose" onclick="closeQrModal()" class="btn-dark">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast">
+    Enlace copiado al portapapeles
+  </div>
+
+  <script>
+    /* ==========================================================================
+       1. SISTEMA MULTI-IDIOMA (ESPAÑOL, INGLÉS, ALEMÁN)
+       ========================================================================== */
+    const TRANSLATIONS = {
+      es: {
+        slogan: "Un paraíso en Bolnuevo",
+        howToGet: "¿Cómo llegar?",
+        reviewTitle: "Opiniones en Google",
+        reviewDesc: "Ver reseñas y fotos del bar",
+        btnSchedule: "Ver Horarios y Ubicación",
+        titleSchedule: "🕒 Horario de Apertura",
+        daysSunThu: "Domingo a Jueves:",
+        daysFriSat: "Viernes y Sábados:",
+        timeSunThu: "16:00 - 23:00",
+        timeFriSat: "16:00 - 00:00",
+        locationDesc: "Cerca del Cámping Bolnuevo, Iglesia y acceso desde el Puerto. CP: 30877 Bolnuevo (Mazarrón).",
+        footer: "Bar El Jardín • Bolnuevo • Tarjeta Digital Interactiva",
+        qrDesc: "Escanea con la cámara del móvil para abrir la tarjeta",
+        qrClose: "Cerrar",
+        toastCopy: "¡Enlace copiado al portapapeles!",
+        toastError: "Error al copiar enlace",
+        open: "Abierto",
+        closed: "Cerrado"
+      },
+      en: {
+        slogan: "A paradise in Bolnuevo",
+        howToGet: "How to get there?",
+        reviewTitle: "Google Reviews",
+        reviewDesc: "Check reviews and photos",
+        btnSchedule: "View Opening Hours & Location",
+        titleSchedule: "🕒 Opening Hours",
+        daysSunThu: "Sunday to Thursday:",
+        daysFriSat: "Friday & Saturday:",
+        timeSunThu: "4:00 PM - 11:00 PM",
+        timeFriSat: "4:00 PM - 12:00 AM",
+        locationDesc: "Near Bolnuevo Camping, Church and direct access from the Port. Postal Code: 30877 Bolnuevo (Mazarrón).",
+        footer: "Bar El Jardín • Bolnuevo • Interactive Digital Card",
+        qrDesc: "Scan with your phone camera to open the digital card",
+        qrClose: "Close",
+        toastCopy: "Link copied to clipboard!",
+        toastError: "Error copying link",
+        open: "Open",
+        closed: "Closed"
+      },
+      de: {
+        slogan: "Ein Paradies in Bolnuevo",
+        howToGet: "Anfahrt & Wegbeschreibung",
+        reviewTitle: "Google-Bewertungen",
+        reviewDesc: "Rezensionen & Fotos ansehen",
+        btnSchedule: "Öffnungszeiten & Standort",
+        titleSchedule: "🕒 Öffnungszeiten",
+        daysSunThu: "Sonntag bis Donnerstag:",
+        daysFriSat: "Freitag und Samstag:",
+        timeSunThu: "16:00 - 23:00 Uhr",
+        timeFriSat: "16:00 - 00:00 Uhr",
+        locationDesc: "In der Nähe vom Campingplatz Bolnuevo, Kirche und Hafenzufahrt. PLZ: 30877 Bolnuevo (Mazarrón).",
+        footer: "Bar El Jardín • Bolnuevo • Interaktive Visitenkarte",
+        qrDesc: "Mit der Handykamera scannen, um die Karte zu öffnen",
+        qrClose: "Schließen",
+        toastCopy: "Link in die Zwischenablage kopiert!",
+        toastError: "Fehler beim Kopieren des Links",
+        open: "Geöffnet",
+        closed: "Geschlossen"
+      }
+    };
+
+    let currentLang = localStorage.getItem("bareljardin_lang") || "es";
+
+    function changeLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem("bareljardin_lang", lang);
+
+      // Actualizar estilos activos de las banderas
+      ['es', 'en', 'de'].forEach(l => {
+        document.getElementById(`btn-${l}`).classList.toggle("is-active", l === lang);
+      });
+
+      // Actualizar textos en la interfaz
+      const t = TRANSLATIONS[lang];
+      document.getElementById("txt-slogan").textContent = t.slogan;
+      document.getElementById("txt-howToGet").textContent = t.howToGet;
+      document.getElementById("txt-reviewTitle").textContent = t.reviewTitle;
+      document.getElementById("txt-reviewDesc").textContent = t.reviewDesc;
+      document.getElementById("txt-btnSchedule").textContent = t.btnSchedule;
+      document.getElementById("txt-titleSchedule").textContent = t.titleSchedule;
+      document.getElementById("txt-daysSunThu").textContent = t.daysSunThu;
+      document.getElementById("txt-daysFriSat").textContent = t.daysFriSat;
+      document.getElementById("txt-timeSunThu").textContent = t.timeSunThu;
+      document.getElementById("txt-timeFriSat").textContent = t.timeFriSat;
+      document.getElementById("txt-locationDesc").textContent = t.locationDesc;
+      document.getElementById("txt-footer").innerHTML = t.footer;
+      document.getElementById("txt-qrDesc").textContent = t.qrDesc;
+      document.getElementById("txt-qrClose").textContent = t.qrClose;
+
+      // Actualizar estado abierto/cerrado con el nuevo idioma
+      calcularEstadoBar();
+
+      // Si la traducción cambia el alto de la tarjeta, reajustar el fondo
+      if (fondoIniciado) congelarFondo();
+    }
+
+    /* ==========================================================================
+       2. CÁLCULO EN TIEMPO REAL (Mantiene la lógica interna 24h española):
+          - Domingo a Jueves: 16:00 a 23:00
+          - Viernes y Sábados: 16:00 a 00:00 (24h)
+          (Hora Peninsular Española)
+       ========================================================================== */
+    const HORARIOS = {
+      0: [{ abre: 16, cierra: 23 }], // Domingo
+      1: [{ abre: 16, cierra: 23 }], // Lunes
+      2: [{ abre: 16, cierra: 23 }], // Martes
+      3: [{ abre: 16, cierra: 23 }], // Miércoles
+      4: [{ abre: 16, cierra: 23 }], // Jueves
+      5: [{ abre: 16, cierra: 24 }], // Viernes: hasta 00:00
+      6: [{ abre: 16, cierra: 24 }]  // Sábado: hasta 00:00
+    };
+
+    let isBarOpen = false;
+
+    function calcularEstadoBar() {
+      const ahora = new Date();
+      const horaEspanaStr = ahora.toLocaleString("en-US", { timeZone: "Europe/Madrid" });
+      const fechaEspana = new Date(horaEspanaStr);
+
+      const diaSemana = fechaEspana.getDay();
+      const horas = fechaEspana.getHours();
+      const minutos = fechaEspana.getMinutes();
+      const horaActualDecimal = horas + (minutos / 60);
+
+      isBarOpen = false;
+      const turnosHoy = HORARIOS[diaSemana];
+
+      if (turnosHoy) {
+        for (const turno of turnosHoy) {
+          if (horaActualDecimal >= turno.abre && horaActualDecimal < turno.cierra) {
+            isBarOpen = true;
+            break;
+          }
+        }
+      }
+
+      actualizarBadge(isBarOpen);
+    }
+
+    function actualizarBadge(abierto) {
+      const badge = document.getElementById("badgeEstado");
+      const texto = document.getElementById("badgeTexto");
+      const t = TRANSLATIONS[currentLang];
+
+      badge.classList.toggle("is-open", abierto);
+      texto.textContent = abierto ? t.open : t.closed;
+    }
+
+    // Inicializar idioma y estado
+    changeLanguage(currentLang);
+    setInterval(calcularEstadoBar, 60000);
+
+    /* ==========================================================================
+       3. MODAL QR Y ACCIONES
+       ========================================================================== */
+    function toggleInfoSection() {
+      const drawer = document.getElementById("infoDrawer");
+      const icon = document.getElementById("chevronIcon");
+      const boton = document.getElementById("btnSchedule");
+
+      // toggle() devuelve true cuando acaba de añadir "hidden" (es decir, al cerrar)
+      const cerrado = drawer.classList.toggle("hidden");
+
+      icon.classList.toggle("is-open", !cerrado);
+      boton.setAttribute("aria-expanded", String(!cerrado));
+
+      // Al cerrar el desplegable la tarjeta vuelve a su alto original:
+      // se recalcula el fondo con ese alto
+      if (cerrado) congelarFondo();
+    }
+
+    let qrGenerated = false;
+    function openQrModal() {
+      const modal = document.getElementById("qrModal");
+
+      // La librería del QR se carga con defer: si aún no ha llegado,
+      // se abre el modal en cuanto el navegador la tenga lista
+      if (!qrGenerated && typeof QRCode === "undefined") {
+        window.addEventListener("load", openQrModal, { once: true });
+        return;
+      }
+
+      modal.classList.remove("hidden");
+
+      if (!qrGenerated) {
+        const qrContainer = document.getElementById("qrcodeCanvas");
+        qrContainer.innerHTML = "";
+        const currentUrl = window.location.href.startsWith("http") ? window.location.href : "https://maps.google.com/?q=Avda.+Antonio+Segado+del+Olmo,+19,+30877+Bolnuevo,+Murcia";
+
+        new QRCode(qrContainer, {
+          text: currentUrl,
+          width: 180,
+          height: 180,
+          colorDark: "#1c1917",
+          colorLight: "#fafaf9",
+          correctLevel: QRCode.CorrectLevel.M
+        });
+        qrGenerated = true;
+      }
+    }
+
+    function closeQrModal() {
+      document.getElementById("qrModal").classList.add("hidden");
+    }
+
+    function copyCardLink() {
+      const tempInput = document.createElement("input");
+      tempInput.value = window.location.href;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      try {
+        document.execCommand("copy");
+        showToast(TRANSLATIONS[currentLang].toastCopy);
+      } catch (e) {
+        showToast(TRANSLATIONS[currentLang].toastError);
+      }
+      document.body.removeChild(tempInput);
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("is-visible");
+      setTimeout(() => {
+        toast.classList.remove("is-visible");
+      }, 2500);
+    }
+
+    window.addEventListener("click", function(event) {
+      const modal = document.getElementById("qrModal");
+      if (event.target === modal) closeQrModal();
+    });
+
+    /* ==========================================================================
+       4. FONDO ESTÁTICO (SIN "ZOOM" AL DESPLEGAR EL HORARIO)
+       La capa del fondo ocupa la tarjeta completa. Cuando se abre el
+       desplegable, la tarjeta crece en alto y la imagen, al ser
+       object-fit: cover + height: 100%, tenía que reescalarse para seguir
+       cubriendo: eso era el "zoom".
+       Solución: se mide la altura de la tarjeta CON el desplegable cerrado
+       y se fija en la capa del fondo. La tarjeta puede crecer libremente,
+       la imagen ya no cambia de tamaño.
+       ========================================================================== */
+    var fondoIniciado = false;
+
+    function congelarFondo() {
+      const capa = document.getElementById("bgLayer");
+      const tarjeta = document.querySelector("main");
+      const cajon = document.getElementById("infoDrawer");
+      if (!capa || !tarjeta || !cajon) return;
+
+      // Con el desplegable abierto la tarjeta está más alta: no se mide
+      if (!cajon.classList.contains("hidden")) return;
+
+      const alto = tarjeta.clientHeight;
+      if (!alto) return;
+
+      capa.style.height = alto + "px";
+      fondoIniciado = true;
+    }
+
+    // Primer cálculo + repeticiones (las fuentes web pueden terminar de
+    // aplicarse después y cambiar el alto real de la tarjeta)
+    congelarFondo();
+    requestAnimationFrame(function () {
+      congelarFondo();
+      requestAnimationFrame(congelarFondo);
+    });
+    window.addEventListener("load", congelarFondo);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(congelarFondo);
+    }
+
+    // Si la tarjeta cambia de alto por cualquier motivo (imágenes, idioma,
+    // textos), se vuelve a congelar. Mientras el desplegable está abierto
+    // la función sale sin hacer nada.
+    if (window.ResizeObserver) {
+      new ResizeObserver(congelarFondo).observe(document.querySelector("main"));
+    }
+
+    // Al girar el móvil o cambiar el tamaño de la ventana
+    let fondoResizeRaf;
+    window.addEventListener("resize", function () {
+      cancelAnimationFrame(fondoResizeRaf);
+      fondoResizeRaf = requestAnimationFrame(congelarFondo);
+    });
+    window.addEventListener("orientationchange", function () {
+      setTimeout(congelarFondo, 350);
+    });
+  </script>
+</body>
+</html>
