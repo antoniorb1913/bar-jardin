@@ -62,6 +62,7 @@ Se añaden además los metadatos de la tarea: estado, rama, commit, archivos toc
 | T8 | Metadatos para compartir y buscadores | 2026-10-29 | `feat/t8-metadatos` |
 | T9 | Iconos e instalación en el móvil | 2026-10-29 | `feat/t9-iconos` |
 | T10 | Robustez: `localStorage`, portapapeles y `innerHTML` | 2026-10-29 | `fix/t10-robustez` |
+| T11 | Accesibilidad: idioma, `aria` y modal | 2026-10-29 | `feat/t11-accesibilidad` |
 
 ---
 
@@ -480,3 +481,39 @@ Además, `document.execCommand("copy")` está obsoleto, y escribir el footer con
 4. «Copiar enlace» → toast → `Ctrl+V` pega la URL.
 5. Consola limpia.
 6. *Verificación automática:* 14 comprobaciones en Node, una de ellas ejecutando el código con un `localStorage` que **lanza excepción**, y las tres vías del portapapeles (API moderna, respaldo y respaldo fallido).
+
+---
+
+## 2026-10-29 · T11 — Accesibilidad: idioma, `aria` y modal
+
+**Estado:** ✅ Completada y verificada por el usuario
+**Rama:** `feat/t11-accesibilidad`
+**Commit:** `feat: mejora la accesibilidad del idioma, las banderas y el modal`
+**Archivos:** `js/i18n.js`, `js/app.js`, `index.html`, `css/styles.css`, `TAREAS.md`
+**Depende de:** T3
+
+### 1. ¿Qué he realizado?
+
+La tarjeta ya se puede usar **sin ratón y con lector de pantalla**: el `<html lang>` cambia con el idioma, las banderas dicen cuál está activa (`aria-pressed`), el toast se anuncia (`role="status"` + `aria-live`), y el modal QR se comporta: **el foco entra al abrirse, `Escape` lo cierra, el tabulador no se escapa, el fondo no se desplaza y el foco vuelve al botón del QR**.
+
+### 2. ¿Por qué?
+
+- `<html lang="es">` **nunca cambiaba**: en inglés o alemán los lectores de pantalla seguían pronunciando en español y Google indexaba en el idioma equivocado.
+- El modal era una **trampa**: no se cerraba con `Escape`, el `Tab` se iba a la tarjeta de detrás y el fondo seguía haciendo scroll. Para quien navega con teclado, era inutilizable.
+- El toast aparecía y desaparecía **sin anunciarse**.
+
+### 3. ¿Dónde verlo en el código?
+
+- `js/i18n.js` — `document.documentElement.lang = lang` y `setAttribute("aria-pressed", ...)` al cambiar de idioma.
+- `js/app.js` — en `openQrModal()`: `document.body.classList.add("modal-abierto")` y foco al primer botón del modal. En `closeQrModal()`: se libera el scroll y el foco vuelve a `#qrBtn`. La gestión de teclado está en `manejarTecladoEnModal()` (`Escape` + trampa de foco con `Tab`/`Shift+Tab`).
+- `index.html` — `aria-pressed` en las tres banderas y `role="status" aria-live="polite"` en el toast.
+- `css/styles.css` — `body.modal-abierto { overflow: hidden; }`.
+
+### 4. ¿Cómo comprobar que funciona?
+
+1. Abrir con `Ctrl+F5`: todo se ve igual.
+2. `Tab` por la tarjeta: el foco se ve y recorre banderas, copiar, QR y horarios.
+3. Cambiar de idioma → `F12` → Elements: `<html lang="en">` / `lang="de"`. Y `aria-pressed` pasa a `true` en la bandera activa.
+4. Abrir el modal con teclado: el foco entra; `Tab` va de la ✕ a «Cerrar» y vuelve; `Escape` cierra y devuelve el foco al botón del QR; el fondo no hace scroll.
+5. Copiar el enlace: el toast se anuncia a los lectores de pantalla.
+6. *Verificación automática:* 18 comprobaciones en Node (idioma, `aria-pressed`, apertura, scroll, foco inicial, `Escape`, devolución del foco y trampa de foco en ambos sentidos).
