@@ -202,17 +202,18 @@ T0  Documentación
 
 # FASE 3 — Compartir e instalar
 
-### T8 · Metadatos para compartir en WhatsApp y redes — ⛔ requiere D1
+### T8 · Metadatos para compartir y buscadores
 
-- **Estado:** ⛔ Bloqueada por D1
-- **Depende de:** T3
-- **Archivos:** `index.html` (`<head>`), nuevo `assets/img/og-image.jpg` (1200×630)
-- **¿Por qué?** `og:image` es hoy `"logo.png"`, una **ruta relativa**. WhatsApp, Telegram, Instagram y Facebook exigen **URL absoluta** para la miniatura: tal como está, **al compartir la tarjeta no sale imagen**. Y esta tarjeta se comparte precisamente por WhatsApp — es su razón de existir. Se añaden además `og:url`, `og:type`, `twitter:card`, `meta description`, `canonical` y `theme-color`.
+- **Estado:** 👀 Esperando tu OK
+- **Depende de:** T3 y D1 (dominio)
+- **Archivos:** `index.html` (`<head>`), nuevo `assets/img/og-image.jpg` (1200×630, 37,3 KB)
+- **¿Por qué?** `og:image` era una **ruta relativa** (`assets/img/logo.png`). WhatsApp, Telegram, Facebook, LinkedIn e Instagram exigen **URL absoluta** para la miniatura: tal como estaba, **al compartir la tarjeta no salía imagen**. Ahora hay una imagen dedicada de 1200×630 y todas las URLs son absolutas. Se añaden además `og:url`, `og:type`, `og:site_name`, `og:locale`, `og:image:width/height`, `twitter:card`, `meta description`, `canonical` y `theme-color`.
 - **¿Cómo comprobar?**
-  1. Pegar la URL en un chat de WhatsApp Web (o Telegram): aparece **imagen + título + descripción**.
-  2. Validar en `https://www.opengraph.xyz` o el depurador de Facebook: todo correcto.
-  3. En DevTools → Elements, comprobar que las etiquetas nuevas están en `<head>`.
-  4. La tarjeta en sí **no cambia** en nada.
+  1. `F12` → Elements → en `<head>` están todas las etiquetas nuevas y **ninguna duplicada**.
+  2. `og:image` y `twitter:image` empiezan por `https://` (no rutas relativas).
+  3. `assets/img/og-image.jpg` existe, mide **1200×630** y pesa 37,3 KB.
+  4. La tarjeta en sí **no cambia** en nada (mismo aspecto, mismo título de pestaña).
+  5. *Cuando esté desplegada:* pegar la URL en un chat o validarla en `opengraph.xyz` debería mostrar **imagen + título + descripción**.
 
 ### T9 · Iconos e instalación en el móvil
 

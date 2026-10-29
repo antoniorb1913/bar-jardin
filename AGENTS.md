@@ -18,7 +18,7 @@
 | **Usuario real** | Cliente del bar, sobre todo en **móvil**. Turistas españoles, ingleses y alemanes |
 | **Idiomas** | Español (por defecto), inglés, alemán |
 | **Repo** | `bar-jardin` (GitHub). **Toda la gestión de Git es del usuario** |
-| **Hosting** | Netlify, despliegue estático, sin build. **Toda el despliegue es del usuario** |
+| **Hosting** | Netlify, despliegue estático, sin build. **Toda el despliegue es del usuario.** ⚠️ **Decisión del usuario (2026-10-29): se despliega al final, cuando el proyecto esté terminado.** Hasta entonces solo se sube a GitHub, y **subir no publica nada** (Netlify no está conectado al repo: la web sigue sirviendo la versión antigua). |
 | **Carpeta de trabajo** | `bar-jardin/` — es la raíz del repo y la raíz que publica Netlify |
 | **Estado** | Fase 1 — estructura. Ver `TAREAS.md` |
 
@@ -324,3 +324,4 @@ Sin instalar nada (todo es relativo y no hay backend):
 | 2026-10-29 | Versión inicial. Ficha del proyecto, 5 reglas del usuario, flujo obligatorio, stack, estructura, contrato de no regresión y convenciones. |
 | 2026-10-29 | Añadida la **REGLA 6** (§7.1): al recibir «¿Todo OK?» → «sí», comprobar que todo está bien subido e informar de lo que falte. Corregidas las medidas reales del CSS (18,1 KB) y del JS (11,5 KB). |
 | 2026-10-29 | **D1 resuelto:** URL canónica `https://bareljardin-bolnuevo.netlify.app/`. Actualizada la tabla de decisiones (§13). Añadida la nota de que Netlify todavía **no** está conectado al repo. |
+| 2026-10-29 | **Política de despliegue:** se sube a GitHub durante todo el proyecto y **el despliegue en Netlify se hace al final**. Subir a GitHub no publica nada. |
