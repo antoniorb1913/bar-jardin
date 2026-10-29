@@ -34,6 +34,12 @@ function openQrModal() {
   }
 
   modal.classList.remove("hidden");
+  document.body.classList.add("modal-abierto");
+
+  // El foco entra en el modal. Si no, el teclado sigue navegando por la
+  // tarjeta que hay detrás y quien no usa ratón no sabe qué tiene delante.
+  const primerBoton = modal.querySelector("button");
+  if (primerBoton) primerBoton.focus();
 
   if (!qrGenerated) {
     const qrContainer = document.getElementById("qrcodeCanvas");
@@ -53,7 +59,14 @@ function openQrModal() {
 }
 
 function closeQrModal() {
-  document.getElementById("qrModal").classList.add("hidden");
+  const modal = document.getElementById("qrModal");
+  if (modal.classList.contains("hidden")) return;
+
+  modal.classList.add("hidden");
+  document.body.classList.remove("modal-abierto");
+
+  // Devolver el foco al botón que abrió el modal, para no dejarlo suelto
+  document.getElementById("qrBtn").focus();
 }
 
 function copyCardLink() {
@@ -197,6 +210,38 @@ function enlazarEventos() {
   modal.addEventListener("click", function (event) {
     if (event.target === modal) closeQrModal();
   });
+
+  // Teclado: Escape cierra el modal y el tabulador no sale de él
+  document.addEventListener("keydown", manejarTecladoEnModal);
+}
+
+/* Con el modal abierto, Escape lo cierra y Tab se queda dentro: el fondo está
+   bloqueado, pero el foco no, así que sin esta trampa el teclado acabaría
+   navegando por la tarjeta que hay detrás. */
+function manejarTecladoEnModal(event) {
+  const modal = document.getElementById("qrModal");
+  if (modal.classList.contains("hidden")) return;
+
+  if (event.key === "Escape") {
+    closeQrModal();
+    return;
+  }
+
+  if (event.key !== "Tab") return;
+
+  const enfocables = modal.querySelectorAll("button, [href], input, [tabindex]:not([tabindex='-1'])");
+  if (!enfocables.length) return;
+
+  const primero = enfocables[0];
+  const ultimo = enfocables[enfocables.length - 1];
+
+  if (event.shiftKey && document.activeElement === primero) {
+    event.preventDefault();
+    ultimo.focus();
+  } else if (!event.shiftKey && document.activeElement === ultimo) {
+    event.preventDefault();
+    primero.focus();
+  }
 }
 
 function iniciar() {
