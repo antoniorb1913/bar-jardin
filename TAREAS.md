@@ -34,12 +34,12 @@
 | Fase | Tareas | Completadas |
 |---|---|---|
 | **0** · Documentación | T0 | 1 / 1 |
-| **1** · Estructura | T1 – T3 | 2 / 3 |
+| **1** · Estructura | T1 – T3 | 3 / 3 |
 | **2** · Rendimiento y peso | T4 – T7 | 0 / 4 |
 | **3** · Compartir e instalar | T8 – T9 | 0 / 2 |
 | **4** · Robustez y accesibilidad | T10 – T13 | 0 / 4 |
 | **5** · Publicación y seguridad | T14 – T15 | 0 / 2 |
-| **TOTAL** | **16 tareas** | **3 / 16** |
+| **TOTAL** | **16 tareas** | **4 / 16** |
 
 ---
 
@@ -124,9 +124,9 @@ T0  Documentación
 
 ### T3 · Extraer el JS a `js/` y eliminar los `onclick` inline
 
-- **Estado:** ⏳ Pendiente
+- **Estado:** ✅ Completada (2026-10-29)
 - **Depende de:** T2
-- **Archivos:** `index.html` (fuera el `<script>` de las líneas 1046–1341 y los **8 `onclick`**), nuevos `js/i18n.js`, `js/horario.js`, `js/app.js`
+- **Archivos:** `index.html` (fuera el bloque `<script>` y los **8 `onclick`**; se añaden 2 `id`: `qrBtn` y `qrCloseIcon`), nuevos `js/i18n.js` (4,6 KB), `js/horario.js` (1,8 KB), `js/app.js` (6,6 KB)
 - **¿Por qué?** Es la única forma de cerrar la CSP a `script-src 'self'` (los `onclick=` obligan a `'unsafe-inline'`), y separa responsabilidades: traducciones / lógica de horario / interfaz y arranque.
 - **⚠️ Riesgo conocido:** hoy `changeLanguage()` se ejecuta en la línea 1201 y llama a `congelarFondo()` usando `fondoIniciado`, declarado más abajo (línea 1295). Al repartir el código en archivos, el arranque **debe** centralizarse en un `init()` al final de `app.js`, dentro de `DOMContentLoaded`, y los `<script>` deben ir con `defer` en orden: `i18n.js` → `horario.js` → `app.js`.
 - **¿Cómo comprobar?**

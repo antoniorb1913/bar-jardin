@@ -43,7 +43,8 @@ Sin `netlify.toml`, sin `_headers`, sin `.gitignore`, sin `README`, sin iconos d
 
 ## 2. Mapa del código original
 
-Referencia para orientarse dentro de `SUBIR-A-NETLIFY/index.html`:
+Referencia histórica: así estaba el código dentro de `SUBIR-A-NETLIFY/index.html`.
+**Desde T3 el código ya está separado**: `css/styles.css`, `js/i18n.js`, `js/horario.js` y `js/app.js`. Esta tabla sirve para localizar cosas en el archivo original.
 
 | Zona | Líneas | Contenido |
 |---|---|---|
