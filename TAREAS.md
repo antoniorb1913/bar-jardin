@@ -35,11 +35,11 @@
 |---|---|---|
 | **0** · Documentación | T0 | 1 / 1 |
 | **1** · Estructura | T1 – T3 | 3 / 3 |
-| **2** · Rendimiento y peso | T4 – T7 | 1 / 4 |
+| **2** · Rendimiento y peso | T4 – T7 | 3 / 4 |
 | **3** · Compartir e instalar | T8 – T9 | 0 / 2 |
 | **4** · Robustez y accesibilidad | T10 – T13 | 0 / 4 |
 | **5** · Publicación y seguridad | T14 – T15 | 0 / 2 |
-| **TOTAL** | **16 tareas** | **5 / 16** |
+| **TOTAL** | **16 tareas** | **7 / 16** |
 
 ---
 
@@ -173,7 +173,7 @@ T0  Documentación
 
 ### T6 · Mover las imágenes a `assets/img/` y optimizar `fondo.webp`
 
-- **Estado:** 👀 Esperando tu OK
+- **Estado:** ✅ Completada (2026-10-29)
 - **Depende de:** T3
 - **Archivos:** `assets/img/logo.png`, `assets/img/palmera.png`, `assets/img/fondo.webp` (nuevos), `index.html` (5 rutas), `TAREAS.md`
 - **¿Por qué?** Las tres imágenes estaban sueltas en la raíz porque T1 fue una copia literal; ahora van a `assets/img/` como pide `AGENTS.md` §4. Y el fondo pesaba **103 KB** para mostrarse al **14 % de opacidad** con una máscara que lo desvanece por abajo. *(Corrección medida: recomprimir a la misma resolución solo ahorraba un 10 %, así que además se reduce el ancho a 560 px —más que el ancho de la tarjeta—, con la misma proporción. Resultado real: −28 %.)*
@@ -186,9 +186,9 @@ T0  Documentación
 
 ### T7 · Quitar el CDN del QR
 
-- **Estado:** ⏳ Pendiente
+- **Estado:** ✅ Completada (2026-10-29)
 - **Depende de:** T3
-- **Archivos:** `index.html` (línea 19), nuevo `js/vendor/qrcode.min.js`
+- **Archivos:** `index.html` (línea 19) y nuevo `js/vendor/qrcode.min.js` (19.927 bytes, copia literal de cdnjs)
 - **¿Por qué?** `cdnjs.cloudflare.com` es un **script de terceros**: si ese CDN se compromete, ejecuta código en tu página. Además `qrcodejs 1.0.0` es de **2012**, sin mantenimiento, y tener un tercero en `script-src` impide cerrar la CSP. Autohospedarlo cuesta lo mismo (un archivo) y elimina el riesgo.
 - **¿Cómo comprobar?**
   1. Network: **ninguna** petición a `cdnjs.cloudflare.com`.
