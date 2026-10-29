@@ -56,6 +56,8 @@ Se añaden además los metadatos de la tarea: estado, rama, commit, archivos toc
 | T2 | Extraer el CSS a `css/styles.css` | 2026-10-29 | `refactor/t2-css-externo` |
 | T3 | Extraer el JS a `js/` y eliminar los `onclick` inline | 2026-10-29 | `refactor/t3-js-externo` |
 | T4 | Recortar las fuentes web cargadas | 2026-10-29 | `perf/t4-recorte-fuentes` |
+| T6 | Mover las imágenes a `assets/img/` y optimizar `fondo.webp` | 2026-10-29 | `perf/t6-imagenes` |
+| T7 | Quitar el CDN del QR | 2026-10-29 | `perf/t7-qr-local` |
 
 ---
 
@@ -256,3 +258,79 @@ He dejado en el `<link>` de Google Fonts **solo lo que la tarjeta usa**: Cinzel 
 3. Abrir el modal QR: el título «BAR EL JARDÍN» sigue en Cinzel 900, igual que antes.
 4. Consola limpia.
 5. `git pull` vuelve a funcionar aunque un archivo se guarde en CRLF.
+
+---
+
+## 2026-10-29 · T6 — Mover las imágenes a `assets/img/` y optimizar `fondo.webp`
+
+**Estado:** ✅ Completada y verificada por el usuario
+**Rama:** `perf/t6-imagenes`
+**Commit:** `perf: mueve las imágenes a assets/img y optimiza el fondo`
+**Archivos:** `assets/img/logo.png`, `assets/img/palmera.png`, `assets/img/fondo.webp` (nuevos), `index.html`, `TAREAS.md`, `HISTORIAL.md`
+**Depende de:** T3
+
+### 1. ¿Qué he realizado?
+
+He movido las tres imágenes de la raíz del repo a `assets/img/`, he actualizado las **5 rutas** de `index.html` (las dos etiquetas `img`, el favicon y `og:image`) y he reducido `fondo.webp` de **103 KB a 73,8 KB**. El peso total del sitio baja de **164,8 KB a 135,5 KB (−18 %)**.
+
+### 2. ¿Por qué?
+
+- **Estructura:** `AGENTS.md` §4 pide `assets/img/`; las imágenes seguían en la raíz porque T1 fue una copia literal.
+- **Peso:** el fondo se muestra al **14 % de opacidad** con una máscara que lo desvanece por abajo, así que su detalle no aporta nada y sí pesaba: era el archivo más pesado del sitio.
+
+**Cómo se eligió el tamaño:** recomprimir a 800 px solo ahorraba un 10 % (el archivo ya venía bien comprimido), así que además se redujo el ancho a **560 px** —por encima del ancho de la tarjeta— manteniendo la proporción exacta (0,6617 → 0,6619) para que `object-fit: cover` recorte igual. Se compararon las versiones de 800, 560 y 400 px a tamaño real de tarjeta y al 14 % de opacidad: **indistinguibles**.
+
+### 3. ¿Dónde verlo en el código?
+
+- `assets/img/fondo.webp` (560×846, 73,8 KB), `assets/img/logo.png` (17,2 KB) y `assets/img/palmera.png` (2,2 KB).
+- `index.html` — las cinco rutas actualizadas: `og:image`, `<link rel="icon">` y las tres `<img>`.
+- Eliminados de la raíz del repo `fondo.webp`, `logo.png` y `palmera.png`; siguen intactos en `SUBIR-A-NETLIFY/` como respaldo de solo lectura.
+- `css/styles.css` — se comprobó que **no usa ningún `url()`**, así que no había más rutas que actualizar.
+
+### 4. ¿Cómo comprobar que funciona?
+
+1. Abrir `bar-jardin/index.html` con `Ctrl+F5`: la tarjeta se ve idéntica.
+2. `F12` → Network: las tres imágenes cargan desde `assets/img/` y ninguna da 404.
+3. La pestaña del navegador sigue mostrando el icono (el favicon también se movió).
+4. Abrir y cerrar el desplegable de horarios: el fondo no hace zoom.
+5. Peso: `fondo.webp` 73,8 KB (antes 103 KB) y total del sitio 135,5 KB (antes 164,8 KB).
+
+---
+
+## 2026-10-29 · T7 — Quitar el CDN del QR
+
+**Estado:** ✅ Completada y verificada por el usuario
+**Rama:** `perf/t7-qr-local`
+**Commit:** `perf: autohospeda la librería del QR y elimina el CDN`
+**Archivos:** `js/vendor/qrcode.min.js` (nuevo), `index.html`, `TAREAS.md`, `HISTORIAL.md`
+**Depende de:** T3
+
+### 1. ¿Qué he realizado?
+
+He descargado la librería del QR (qrcodejs 1.0.0, 19.927 bytes, licencia MIT) y la he guardado **tal cual** en `js/vendor/qrcode.min.js`. El `<script>` de `index.html` ya no apunta a `cdnjs.cloudflare.com`, sino a ese archivo local. **La tarjeta ya no carga ningún script de terceros.**
+
+### 2. ¿Por qué?
+
+- **Seguridad:** un script de un CDN se ejecuta con los permisos de tu página; si ese CDN se compromete, ejecuta código en tu tarjeta. Autohospedado, el riesgo desaparece.
+- **Disponibilidad:** si cdnjs cae o bloquea la petición, el QR dejaría de funcionar.
+- **CSP:** para cerrar la política de seguridad en T14 hace falta que `script-src` sea solo `'self'`.
+- **Versión fija:** el archivo vive en el repo; nadie lo cambia por debajo.
+
+**No ahorra bytes:** son los mismos ~19,9 KB, solo que ahora vienen de tu dominio.
+
+### 3. ¿Dónde verlo en el código?
+
+- `js/vendor/qrcode.min.js` — copia literal del archivo de cdnjs, sin modificar.
+- `index.html:18-21` — el `<script src="js/vendor/qrcode.min.js" defer>` y el comentario con origen, versión, licencia y fecha.
+- Comprobado: ningún archivo del proyecto contiene ya una URL de `cdnjs`/`cloudflare`, y `index.html` no carga ningún script remoto.
+
+### 4. ¿Cómo comprobar que funciona?
+
+1. `Ctrl+F5`: la tarjeta se ve idéntica.
+2. Abrir el modal QR: el QR se dibuja igual que antes.
+3. Escanearlo con el móvil: **en la web publicada abre la propia tarjeta**; si el archivo se abre en local (`file://`), el QR lleva a Google Maps. Ese comportamiento ya existía y está en `js/app.js:41`.
+4. `F12` → Network: `qrcode.min.js` responde 200 desde tu dominio y no hay peticiones a cdnjs.
+5. Cerrar y reabrir el modal: el QR no se duplica.
+6. Consola sin errores.
+
+*Verificación automática:* 9 comprobaciones en Node —la librería se evalúa sin errores, expone `QRCode` y `QRCode.CorrectLevel` con L/M/Q/H (lo que usa `app.js`), sus únicas URLs son namespaces W3C, y el proyecto no referencia el CDN—.
