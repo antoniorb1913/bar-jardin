@@ -38,8 +38,8 @@
 | **2** · Rendimiento y peso | T4 – T7 | 4 / 4 |
 | **3** · Compartir e instalar | T8 – T9 | 2 / 2 |
 | **4** · Robustez y accesibilidad | T10 – T13 | 4 / 4 |
-| **5** · Publicación y seguridad | T14 – T15 | 0 / 2 |
-| **TOTAL** | **16 tareas** | **14 / 16** |
+| **5** · Publicación y seguridad | T14 – T15 | 1 / 2 |
+| **TOTAL** | **16 tareas** | **15 / 16** |
 
 ---
 
@@ -305,7 +305,7 @@ T0  Documentación
 
 ### T14 · Configuración de Netlify y cabeceras de seguridad
 
-- **Estado:** 👀 Esperando tu OK
+- **Estado:** ✅ Completada (2026-10-29)
 - **Depende de:** **T3, T5 y T7** (si no, la CSP rompe la página)
 - **Archivos:** `netlify.toml`, `_headers`, `robots.txt`, `sitemap.xml`, `404.html`, `README.md` y `.gitignore` (todos nuevos o reescritos)
 - **¿Por qué?** Aquí se recoge el fruto de todo lo anterior: con el JS y el CSS en archivos y sin ningún CDN, se puede aplicar una **CSP estricta** (`default-src 'self'`, sin `'unsafe-inline'`) que bloquee de verdad cualquier script inyectado. Además `nosniff`, `Referrer-Policy`, `Permissions-Policy` (bloquear cámara, micrófono y geolocalización), `X-Frame-Options`/`frame-ancestors`, y `Cache-Control: immutable` para los assets, que hace que las visitas repetidas sean casi instantáneas.
@@ -320,16 +320,27 @@ T0  Documentación
 
 ### T15 · Verificación final integral
 
-- **Estado:** ⏳ Pendiente
+- **Estado:** 👀 Esperando tu OK
 - **Depende de:** todas las anteriores
 - **Archivos:** ninguno (solo verificación; se corrigen detalles si aparecen)
-- **¿Por qué?** Lo último que se revisa son las **piezas sueltas**, no el conjunto. Esta tarea comprueba que la suma de los cambios no ha roto nada, comparando contra la versión original.
-- **¿Cómo comprobar?**
+- **¿Por qué?** Lo último que se revisa son las **piezas sueltas**, no el conjunto. Esta tarea comprueba que la suma de todos los cambios no ha roto nada, comparando contra la versión original.
+- **Auditoría automática (hecha, todo correcto):**
+  - Los **31 archivos** esperados existen.
+  - Los **29 `id`** que usa el JavaScript existen en el HTML (detecta cualquier error de nombre).
+  - Las **13 rutas** de `index.html`, los **6 `url()`** del CSS y los iconos del manifest resuelven.
+  - Cero `onclick`, cero `<style>`, cero atributos `style=`, cero `<script>` con código dentro y **cero recursos de dominios ajenos**.
+  - Cero `eval`/`new Function` en el código propio.
+  - Los **3 idiomas tienen exactamente las mismas 18 claves**.
+  - Las dimensiones declaradas de las 3 imágenes coinciden con las reales.
+  - Sintaxis correcta en los 4 archivos JS.
+  - Primera carga: **211,9 KB** (todo desde el propio dominio).
+- **¿Cómo comprobar?** (la parte que necesita un navegador)
   1. **Comparación lado a lado** con `SUBIR-A-NETLIFY/index.html`: móvil (390 px) y escritorio, en los 3 idiomas, con el desplegable abierto y cerrado, y con el modal QR abierto. **Sin diferencias visuales.**
-  2. Checklist funcional completo: banderas + persistencia · badge abierto/cerrado · drawer + chevron + `aria-expanded` · modal (abrir, ✕, clic en fondo, `Escape`) · copiar enlace + toast · los 4 enlaces en pestaña nueva · QR escaneado con un móvil real · fondo sin zoom.
+  2. Checklist funcional completo: banderas + persistencia · badge abierto/cerrado · drawer + chevron + `aria-expanded` · modal (abrir, ✕, clic en fondo, `Escape`) · copiar enlace + toast · los 4 enlaces en pestaña nueva · QR escaneado con un móvil real · fondo sin zoom · navegación con `Tab`.
   3. Consola limpia en todas las vistas.
   4. Lighthouse móvil: **Rendimiento ≥ 95**, **Accesibilidad ≥ 95**, **Buenas prácticas ≥ 95**, **SEO ≥ 95**.
-  5. Peso total de la primera carga y comparación con el punto de partida (objetivo: menos de la mitad de fuentes y ~30 % menos de imágenes).
+  5. Peso total de la primera carga y comparación con el punto de partida.
+  6. **Tras desplegar:** `securityheaders.com` → nota **A**, CSP en las cabeceras, 404 propia funcionando y `/robots.txt` respondiendo.
 
 ---
 

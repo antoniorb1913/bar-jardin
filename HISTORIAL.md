@@ -65,6 +65,7 @@ Se añaden además los metadatos de la tarea: estado, rama, commit, archivos toc
 | T11 | Accesibilidad: idioma, `aria` y modal | 2026-10-29 | `feat/t11-accesibilidad` |
 | T12 | Cálculo de horario con `Intl.DateTimeFormat` | 2026-10-29 | `refactor/t12-horario-intl` |
 | T13 | Imágenes sin salto de layout | 2026-10-29 | `perf/t13-imagenes-sin-salto` |
+| T14 | Configuración de Netlify y cabeceras de seguridad | 2026-10-29 | `feat/t14-seguridad-netlify` |
 
 ---
 
@@ -584,3 +585,43 @@ Sin esos atributos el navegador no conoce la proporción de la imagen hasta que 
 2. `F12` → Network → throttling *Slow 3G* → recargar: la tarjeta **no salta**; el hueco del logotipo está reservado.
 3. Lighthouse → CLS por debajo de 0,1 (idealmente 0).
 4. El fondo sigue sin hacer zoom al desplegar los horarios.
+
+---
+
+## 2026-10-29 · T14 — Configuración de Netlify y cabeceras de seguridad
+
+**Estado:** ✅ Completada y verificada por el usuario
+**Rama:** `feat/t14-seguridad-netlify`
+**Commit:** `feat: añade cabeceras de seguridad, CSP estricta y configuración de Netlify`
+**Archivos:** `_headers`, `netlify.toml`, `404.html`, `robots.txt`, `sitemap.xml`, `README.md`, `.gitignore`, `css/styles.css`, `TAREAS.md`
+**Depende de:** T3, T5 y T7
+
+### 1. ¿Qué he realizado?
+
+He añadido todo lo necesario para publicar el sitio con seguridad y buen rendimiento: `_headers` con **CSP estricta**, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, `X-Frame-Options`/`frame-ancestors` y caché de un año para los assets; `netlify.toml` para publicar la raíz sin build; una **404 propia** con el estilo de la tarjeta; `robots.txt`; `sitemap.xml`; un `README.md` de verdad (antes eran 2 líneas) y un `.gitignore`.
+
+### 2. ¿Por qué?
+
+Esta es la tarea donde se cobra todo lo anterior. Una **CSP estricta no es posible** si hay CSS o JS en línea, `onclick` o scripts de terceros: obligaría a `'unsafe-inline'`, que la deja decorativa. Como en T2, T3, T5 y T7 se eliminaron todos esos casos, ahora se puede poner `script-src 'self'` **sin excepciones**: un `<script>` inyectado no se ejecutaría.
+
+Además: sin cabeceras, el navegador no sabe que el sitio no debe enmarcarse, que no debe adivinar tipos MIME, ni que no necesita cámara ni geolocalización. Y sin `Cache-Control: immutable` en los assets, cada visita vuelve a pedir archivos que no han cambiado.
+
+### 3. ¿Dónde verlo en el código?
+
+- `_headers` — bloque `/*` con las cabeceras de seguridad; bloques por ruta con la caché.
+- `netlify.toml` — `[build] publish = "."`, sin comando de build.
+- `404.html` y la sección «Página 404» al final de `css/styles.css`.
+- `robots.txt`, `sitemap.xml`, `README.md` y `.gitignore`.
+
+### 4. ¿Cómo comprobar que funciona?
+
+**En local no se puede** (las cabeceras las pone Netlify al servir). Después de desplegar:
+
+1. `https://securityheaders.com` → nota **A**.
+2. DevTools → Network → `index.html`: la CSP en las cabeceras de respuesta.
+3. `css/styles.css`: `cache-control: public, max-age=31536000, immutable`.
+4. Consola **sin violaciones de CSP**.
+5. `/loquesea` muestra la 404 propia; `/robots.txt` y `/sitemap.xml` responden.
+6. El sitio funciona exactamente igual.
+
+*Verificación local hecha:* la CSP cubre los 4 scripts, la hoja de estilos, las 3 imágenes, las 2 fuentes y el `data:` del QR; ni el código propio ni la librería del QR usan `eval`, `new Function` ni estilos en línea.
