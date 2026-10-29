@@ -34,12 +34,12 @@
 | Fase | Tareas | Completadas |
 |---|---|---|
 | **0** · Documentación | T0 | 1 / 1 |
-| **1** · Estructura | T1 – T3 | 0 / 3 |
+| **1** · Estructura | T1 – T3 | 1 / 3 |
 | **2** · Rendimiento y peso | T4 – T7 | 0 / 4 |
 | **3** · Compartir e instalar | T8 – T9 | 0 / 2 |
 | **4** · Robustez y accesibilidad | T10 – T13 | 0 / 4 |
 | **5** · Publicación y seguridad | T14 – T15 | 0 / 2 |
-| **TOTAL** | **16 tareas** | **1 / 16** |
+| **TOTAL** | **16 tareas** | **2 / 16** |
 
 ---
 
@@ -97,7 +97,7 @@ T0  Documentación
 
 ### T1 · Migrar el proyecto a `bar-jardin` (copia literal)
 
-- **Estado:** 👀 Esperando tu OK
+- **Estado:** ✅ Completada (2026-10-29)
 - **Depende de:** T0
 - **Archivos:** crea `index.html`, `logo.png`, `palmera.png`, `fondo.webp` en `bar-jardin/`
 - **¿Por qué?** `bar-jardin/` debe ser la **única fuente de verdad** y la raíz que publica Netlify. Hoy hay tres copias del proyecto (raíz del workspace, `SUBIR-A-NETLIFY/` y el `.zip`): es la receta perfecta para editar el archivo equivocado y desplegar el otro.
@@ -110,14 +110,14 @@ T0  Documentación
 
 ### T2 · Extraer el CSS a `css/styles.css`
 
-- **Estado:** ⏳ Pendiente
+- **Estado:** 👀 Esperando tu OK
 - **Depende de:** T1
-- **Archivos:** `index.html` (se elimina el bloque `<style>`, líneas 21–781), nuevo `css/styles.css`
-- **¿Por qué?** Un `index.html` de 1.343 líneas con 23 KB de CSS en medio es incómodo de mantener, no se cachea aparte y **no permite aplicar una CSP estricta** (con `<style>` inline habría que permitir `'unsafe-inline'`, que anula la protección).
+- **Archivos:** `index.html` (se elimina el bloque `<style>`, líneas 21–781), nuevo `css/styles.css` (759 líneas, 15,9 KB)
+- **¿Por qué?** Un `index.html` de 1.343 líneas con 18 KB de CSS en medio es incómodo de mantener, no se cachea aparte y **no permite aplicar una CSP estricta** (con `<style>` inline habría que permitir `'unsafe-inline'`, que anula la protección).
 - **¿Cómo comprobar?**
   1. `index.html` ya no contiene ninguna etiqueta `<style>`.
   2. En `<head>` hay `<link rel="stylesheet" href="css/styles.css">`.
-  3. El contenido de `css/styles.css` es **exactamente** el que estaba entre `<style>` y `</style>` (mismos valores, sin reordenar).
+  3. El contenido de `css/styles.css` es el mismo que estaba entre `<style>` y `</style>`: mismos valores y mismo orden, solo sin la indentación base de 4 espacios (para que sea un archivo CSS normal).
   4. Al abrir la página: idéntica, sin parpadeo de "contenido sin estilos" (recarga con `Ctrl+F5`).
   5. DevTools → Network: `styles.css` responde 200.
   6. Consola sin errores.
