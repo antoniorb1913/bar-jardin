@@ -35,11 +35,11 @@
 |---|---|---|
 | **0** · Documentación | T0 | 1 / 1 |
 | **1** · Estructura | T1 – T3 | 3 / 3 |
-| **2** · Rendimiento y peso | T4 – T7 | 0 / 4 |
+| **2** · Rendimiento y peso | T4 – T7 | 1 / 4 |
 | **3** · Compartir e instalar | T8 – T9 | 0 / 2 |
 | **4** · Robustez y accesibilidad | T10 – T13 | 0 / 4 |
 | **5** · Publicación y seguridad | T14 – T15 | 0 / 2 |
-| **TOTAL** | **16 tareas** | **4 / 16** |
+| **TOTAL** | **16 tareas** | **5 / 16** |
 
 ---
 
@@ -147,7 +147,7 @@ T0  Documentación
 
 ### T4 · Recortar las fuentes web cargadas
 
-- **Estado:** 👀 Esperando tu OK
+- **Estado:** ✅ Completada (2026-10-29)
 - **Depende de:** T3
 - **Archivos:** `index.html` (línea 16, el `<link>` de Google Fonts) y `.gitattributes` (nuevo, para normalizar finales de línea)
 - **¿Por qué?** Se piden 3 familias y 9 pesos, pero **Playfair Display no se usa en ninguna regla del CSS** y de **Cinzel** solo se aplica el **900** (el título del modal QR). *(Corrección: el navegador no descarga los pesos que no se aplican, así que el ahorro real es pequeño; es sobre todo **corrección** — pedir solo lo que se usa — y deja limpia la auditoría de fuentes de T5.)*
@@ -171,18 +171,18 @@ T0  Documentación
   4. Sin parpadeo de fuente (FOUT) gracias a `font-display: swap` + `preload`.
   5. Funciona **sin conexión a internet** una vez cargada la página (salvo enlaces externos).
 
-### T6 · Mover las imágenes a `assets/img/` y recomprimir `fondo.webp`
+### T6 · Mover las imágenes a `assets/img/` y optimizar `fondo.webp`
 
-- **Estado:** ⏳ Pendiente
+- **Estado:** 👀 Esperando tu OK
 - **Depende de:** T3
-- **Archivos:** `assets/img/logo.png`, `assets/img/palmera.png`, `assets/img/fondo.webp`, `index.html` (rutas `src`)
-- **¿Por qué?** Las tres imágenes quedan en la raíz porque T1 es una copia literal; en cuanto se puedan tocar las rutas, pasan a `assets/img/` como pide `AGENTS.md` §4. Y el fondo son **103 KB** para una imagen que se muestra al **14 % de opacidad** y con una máscara que la desvanece por abajo: es, con diferencia, el archivo más pesado del sitio y se nota muchísimo menos de lo que pesa.
+- **Archivos:** `assets/img/logo.png`, `assets/img/palmera.png`, `assets/img/fondo.webp` (nuevos), `index.html` (5 rutas), `TAREAS.md`
+- **¿Por qué?** Las tres imágenes estaban sueltas en la raíz porque T1 fue una copia literal; ahora van a `assets/img/` como pide `AGENTS.md` §4. Y el fondo pesaba **103 KB** para mostrarse al **14 % de opacidad** con una máscara que lo desvanece por abajo. *(Corrección medida: recomprimir a la misma resolución solo ahorraba un 10 %, así que además se reduce el ancho a 560 px —más que el ancho de la tarjeta—, con la misma proporción. Resultado real: −28 %.)*
 - **¿Cómo comprobar?**
-  1. Peso final: **≈ 25–35 KB** (antes 103 KB).
-  2. Dimensiones **iguales** (800×1209) para que el recorte (`object-fit: cover`, `object-position: right bottom`) no cambie.
-  3. Comparar con la versión anterior: **sobre todo la esquina inferior derecha**, donde se ve más. No deben aparecer bandas ni bloques en las zonas de degradado.
+  1. `fondo.webp` pasa de **103 KB a 73,8 KB** (−28 %) y de 800×1209 a **560×846**, con la **misma proporción** (0,6617 → 0,6619) para que `object-fit: cover` recorte exactamente igual.
+  2. DevTools → Network: las tres imágenes cargan desde `assets/img/` y ninguna da 404.
+  3. La tarjeta se ve idéntica: logo arriba, palmera en el separador y el fondo tenue.
   4. Abrir y cerrar el desplegable de horarios: el fondo sigue sin hacer zoom.
-  5. Tras el traslado, las tres imágenes cargan sin ningún 404 (DevTools → Network) y la tarjeta se ve idéntica.
+  5. La pestaña del navegador sigue mostrando el icono (el favicon también se movió a `assets/img/`).
 
 ### T7 · Quitar el CDN del QR
 

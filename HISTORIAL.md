@@ -55,6 +55,7 @@ Se añaden además los metadatos de la tarea: estado, rama, commit, archivos toc
 | T1 | Migrar el proyecto a `bar-jardin` (copia literal) | 2026-10-29 | `chore/t1-copia-proyecto` |
 | T2 | Extraer el CSS a `css/styles.css` | 2026-10-29 | `refactor/t2-css-externo` |
 | T3 | Extraer el JS a `js/` y eliminar los `onclick` inline | 2026-10-29 | `refactor/t3-js-externo` |
+| T4 | Recortar las fuentes web cargadas | 2026-10-29 | `perf/t4-recorte-fuentes` |
 
 ---
 
@@ -220,3 +221,38 @@ He sacado los 11,5 KB de JavaScript que vivían dentro de `index.html` a tres ar
 9. Al desplegar los horarios el fondo **no hace zoom**.
 
 *Verificación automática adicional:* `node --check` en los tres archivos + 22 comprobaciones ejecutando el código en Node con un DOM simulado, comparando `TRANSLATIONS` y `HORARIOS` con el original (idénticos) y probando arranque, idiomas, cajón, modal, portapapeles y fondo.
+
+---
+
+## 2026-10-29 · T4 — Recortar las fuentes web cargadas
+
+**Estado:** ✅ Completada y verificada por el usuario
+**Rama:** `perf/t4-recorte-fuentes`
+**Commit:** `perf: recorta las fuentes web a las que se usan de verdad` + `chore: añade .gitattributes para normalizar los finales de línea`
+**Archivos:** `index.html`, `.gitattributes` (nuevo), `TAREAS.md`
+**Depende de:** T3
+
+### 1. ¿Qué he realizado?
+
+He dejado en el `<link>` de Google Fonts **solo lo que la tarjeta usa**: Cinzel en peso 900 e Inter en 400/500/600/700/800. Han desaparecido **Playfair Display** (no se usaba en ninguna regla del CSS) y los pesos 600 y 700 de Cinzel. Además se ha creado `.gitattributes` para normalizar los finales de línea a LF.
+
+### 2. ¿Por qué?
+
+- **Corrección:** el CSS pedía una familia completa que la tarjeta nunca usaba y dos pesos de Cinzel que tampoco.
+- **`.gitattributes`:** los archivos se estaban guardando en Windows con CRLF y git los veía como modificados, lo que bloqueaba `git pull` una y otra vez (el error *"cannot pull with rebase: You have unstaged changes"*).
+
+**Aviso de honestidad:** al analizar el proyecto estimé un ahorro de 60–80 KB con esta tarea. **La estimación era falsa**: el navegador solo descarga los pesos de fuente que se aplican a texto real, así que Playfair y los Cinzel sobrantes nunca llegaban a descargarse. El ahorro real es de **~1–2 KB de CSS y 6 reglas `@font-face` menos**.
+
+### 3. ¿Dónde verlo en el código?
+
+- `index.html:16` — el nuevo `<link>`: `family=Cinzel:wght@900&family=Inter:wght@400;500;600;700;800&display=swap`.
+- `.gitattributes` — `* text=auto eol=lf` y los binarios (`.png`, `.webp`, `.woff2`…) marcados como `binary`.
+- Comprobado contra `css/styles.css`: las únicas familias usadas son `Cinzel` e `Inter`; los pesos reales son 500, 600, 700, 800 (+400 por defecto) y 900.
+
+### 4. ¿Cómo comprobar que funciona?
+
+1. Abrir `bar-jardin/index.html` con `Ctrl+F5`: la tarjeta se ve idéntica.
+2. `F12` → Network → filtro *Font*: ya no aparece ninguna fuente Playfair.
+3. Abrir el modal QR: el título «BAR EL JARDÍN» sigue en Cinzel 900, igual que antes.
+4. Consola limpia.
+5. `git pull` vuelve a funcionar aunque un archivo se guarde en CRLF.
