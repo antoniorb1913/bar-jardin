@@ -36,10 +36,10 @@
 | **0** · Documentación | T0 | 1 / 1 |
 | **1** · Estructura | T1 – T3 | 3 / 3 |
 | **2** · Rendimiento y peso | T4 – T7 | 3 / 4 |
-| **3** · Compartir e instalar | T8 – T9 | 1 / 2 |
+| **3** · Compartir e instalar | T8 – T9 | 2 / 2 |
 | **4** · Robustez y accesibilidad | T10 – T13 | 0 / 4 |
 | **5** · Publicación y seguridad | T14 – T15 | 0 / 2 |
-| **TOTAL** | **16 tareas** | **8 / 16** |
+| **TOTAL** | **16 tareas** | **9 / 16** |
 
 ---
 
@@ -48,7 +48,7 @@
 | ID | Decisión | Bloquea | Estado |
 |---|---|---|---|
 | **D1** | **Dominio definitivo** | T7 (opción B), T8 | ✅ **RESUELTO (2026-10-29):** `https://bareljardin-bolnuevo.netlify.app/` (subdominio gratuito de Netlify, verificado 200) |
-| **D2** | **¿Autohospedar las fuentes?** (subir `.woff2` al repo; licencia OFL lo permite) | T5 | ⏳ **Sin decidir** (recomendado: sí) |
+| **D2** | **¿Autohospedar las fuentes?** (subir `.woff2` al repo; licencia OFL lo permite) | T5 | ✅ **RESUELTO (2026-10-29): sí.** Se autohospedan los mismos `.woff2` que servía Google. |
 
 ---
 
@@ -158,18 +158,19 @@ T0  Documentación
   4. El resto de textos se ven igual (Inter).
   5. Comparación visual antes/después: **sin diferencias**.
 
-### T5 · Autohospedar las fuentes (INTER y CINZEL) — ⛔ requiere D2
+### T5 · Autohospedar las fuentes (Inter y Cinzel)
 
-- **Estado:** ⛔ Bloqueada por D2
-- **Depende de:** T4
-- **Archivos:** `css/styles.css` (`@font-face`), `assets/fonts/*.woff2`, `assets/fonts/OFL.txt`, `index.html` (quita `preconnect` y el `<link>` de Google, añade `preload`)
-- **¿Por qué?** Dos motivos: (1) **RGPD** — cargar Google Fonts envía la IP de cada visitante a Google y en España/UE eso se considera un incumplimiento; para un negocio español es un riesgo evitable; (2) **velocidad** — dos dominios menos que resolver y conectar.
+- **Estado:** 👀 Esperando tu OK
+- **Depende de:** T4 y D2
+- **Archivos:** `css/styles.css` (6 reglas `@font-face`), `assets/fonts/inter.woff2` + `cinzel-900.woff2` + 2 licencias OFL (nuevos), `index.html` (fuera los 2 `preconnect` y el `<link>` de Google, entra un `preload`)
+- **¿Por qué?** (1) **RGPD**: cargar Google Fonts envía la IP de cada visitante a Google, que en España/UE se considera incumplimiento; (2) **velocidad**: dos dominios menos que resolver y conectar; (3) **independencia**: la tarjeta ya no le pide nada a nadie, y si Google bloquea o cae, se sigue viendo igual.
+- **Hallazgo útil:** Google sirve **los cinco pesos de Inter con un solo archivo** (son idénticos byte a byte). Por eso en el repo hay **un** `inter.woff2` de 47 KB en vez de 235 KB, y un solo `preload` cubre todos los pesos.
 - **¿Cómo comprobar?**
-  1. Network: **cero** peticiones a `fonts.googleapis.com` y `fonts.gstatic.com`; los `.woff2` se sirven desde tu dominio.
-  2. La tipografía se ve **idéntica** (mismos archivos `woff2` que servía Google → render igual).
+  1. `F12` → Network: **cero** peticiones a `fonts.googleapis.com` y `fonts.gstatic.com`; `inter.woff2` sale de tu dominio.
+  2. La tipografía se ve **idéntica** (son los mismos archivos que servía Google).
   3. Consola: `document.fonts.check('16px Inter')` devuelve `true`.
-  4. Sin parpadeo de fuente (FOUT) gracias a `font-display: swap` + `preload`.
-  5. Funciona **sin conexión a internet** una vez cargada la página (salvo enlaces externos).
+  4. Sin parpadeo de fuente: `font-display: swap` + `preload`.
+  5. Al abrir el modal QR, se carga `cinzel-900.woff2` y el título se ve igual.
 
 ### T6 · Mover las imágenes a `assets/img/` y optimizar `fondo.webp`
 
@@ -204,7 +205,7 @@ T0  Documentación
 
 ### T8 · Metadatos para compartir y buscadores
 
-- **Estado:** 👀 Esperando tu OK
+- **Estado:** ✅ Completada (2026-10-29)
 - **Depende de:** T3 y D1 (dominio)
 - **Archivos:** `index.html` (`<head>`), nuevo `assets/img/og-image.jpg` (1200×630, 37,3 KB)
 - **¿Por qué?** `og:image` era una **ruta relativa** (`assets/img/logo.png`). WhatsApp, Telegram, Facebook, LinkedIn e Instagram exigen **URL absoluta** para la miniatura: tal como estaba, **al compartir la tarjeta no salía imagen**. Ahora hay una imagen dedicada de 1200×630 y todas las URLs son absolutas. Se añaden además `og:url`, `og:type`, `og:site_name`, `og:locale`, `og:image:width/height`, `twitter:card`, `meta description`, `canonical` y `theme-color`.

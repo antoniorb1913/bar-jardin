@@ -58,6 +58,7 @@ Se añaden además los metadatos de la tarea: estado, rama, commit, archivos toc
 | T4 | Recortar las fuentes web cargadas | 2026-10-29 | `perf/t4-recorte-fuentes` |
 | T6 | Mover las imágenes a `assets/img/` y optimizar `fondo.webp` | 2026-10-29 | `perf/t6-imagenes` |
 | T7 | Quitar el CDN del QR | 2026-10-29 | `perf/t7-qr-local` |
+| T8 | Metadatos para compartir y buscadores | 2026-10-29 | `feat/t8-metadatos` |
 | T9 | Iconos e instalación en el móvil | 2026-10-29 | `feat/t9-iconos` |
 
 ---
@@ -369,3 +370,37 @@ Detalle de diseño: en la **pestaña** del navegador se usa la **palmera** (el l
 3. `F12` → Application → Manifest: sin errores ni avisos, con los iconos 192 y 512 y los colores declarados.
 4. En el móvil, «Añadir a pantalla de inicio»: icono con el logotipo y el nombre «El Jardín».
 5. `F12` → Network: los cinco iconos y el manifest responden 200, ninguno da 404.
+
+---
+
+## 2026-10-29 · T8 — Metadatos para compartir y buscadores
+
+**Estado:** ✅ Completada y verificada por el usuario
+**Rama:** `feat/t8-metadatos`
+**Commit:** `feat: añade metadatos para compartir y la imagen og`
+**Archivos:** `index.html` (`<head>`), `assets/img/og-image.jpg` (nuevo), `TAREAS.md`, `AGENTS.md`
+**Depende de:** T3 y D1
+
+### 1. ¿Qué he realizado?
+
+He creado una **imagen dedicada para compartir** (`assets/img/og-image.jpg`, 1200×630, 37,3 KB: fondo crema, el logotipo centrado y un filete ámbar, los mismos colores de la tarjeta) y he reescrito el `<head>` con los metadatos completos: `description`, `canonical`, `theme-color`, el bloque **Open Graph** (`og:type`, `og:site_name`, `og:locale`, `og:url`, `og:title`, `og:description`, `og:image`, `og:image:width/height/alt`) y el bloque **Twitter/X** (`twitter:card`, `twitter:title`, `twitter:description`, `twitter:image`). Todas las URLs son **absolutas** al dominio canónico.
+
+### 2. ¿Por qué?
+
+Porque `og:image` era una **ruta relativa** (`assets/img/logo.png`) y WhatsApp, Facebook, Telegram, LinkedIn o Instagram **exigen URL absoluta** para mostrar la miniatura: tal como estaba, al compartir la tarjeta **no salía ninguna imagen**, solo un enlace pelado. Además faltaban `canonical` y `description`, que es lo que usan Google y los navegadores.
+
+La imagen nueva tampoco es capricho: el logotipo mide 1200×501 (ratio 2,4:1) y las redes sociales esperan ~1,91:1; con la og de 1200×630 la miniatura no sale recortada.
+
+### 3. ¿Dónde verlo en el código?
+
+- `index.html:8-31` — los tres bloques de metadatos (buscadores, Open Graph, Twitter).
+- `assets/img/og-image.jpg` — 1200×630, 37,3 KB.
+- `AGENTS.md` §13 — la URL canónica usada en `og:url`, `canonical` y las imágenes.
+
+### 4. ¿Cómo comprobar que funciona?
+
+1. Abrir `bar-jardin/index.html` con `Ctrl+F5`: la tarjeta se ve idéntica, con el mismo título de pestaña.
+2. `F12` → Elements → en `<head>` están todas las etiquetas y **ninguna duplicada**.
+3. `og:image` y `twitter:image` empiezan por `https://` (no rutas relativas).
+4. Abrir `assets/img/og-image.jpg` en el navegador: es la imagen de la miniatura y mide 1200×630.
+5. **Pendiente para el despliegue:** cuando la web esté publicada, pegar la URL en un chat o validarla en `opengraph.xyz` debería mostrar imagen, título y descripción. Esta comprobación **no se puede hacer en local**, porque las redes leen el HTML publicado.
