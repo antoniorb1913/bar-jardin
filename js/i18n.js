@@ -132,6 +132,10 @@ function changeLanguage(lang) {
   // Actualizar estado abierto/cerrado con el nuevo idioma
   calcularEstadoBar();
 
-  // Si la traducción cambia el alto de la tarjeta, reajustar el fondo
-  if (fondoIniciado) congelarFondo();
+  // Ojo: aquí NO se reajusta el fondo, y es a propósito. El alemán ocupa más
+  // líneas que el español o el inglés, así que la tarjeta crece; si el fondo
+  // se re-midiera con el nuevo alto, la imagen se reescalaría para cubrirlo y
+  // se vería un pequeño "zoom" al cambiar de idioma (se notaba en el móvil).
+  // La capa del fondo se queda con su altura y la máscara del borde inferior
+  // hace que la diferencia no se aprecie.
 }

@@ -130,8 +130,6 @@ function showToast(message) {
    la imagen ya no cambia de tamaño.
    ========================================================================== */
 
-let fondoIniciado = false;
-
 function congelarFondo() {
   const capa = document.getElementById("bgLayer");
   const tarjeta = document.querySelector("main");
@@ -145,7 +143,6 @@ function congelarFondo() {
   if (!alto) return;
 
   capa.style.height = alto + "px";
-  fondoIniciado = true;
 }
 
 /* ==========================================================================
@@ -170,12 +167,13 @@ function prepararFondo() {
     document.fonts.ready.then(congelarFondo);
   }
 
-  // Si la tarjeta cambia de alto por cualquier motivo (imágenes, idioma,
-  // textos), se vuelve a congelar. Mientras el desplegable está abierto
-  // la función sale sin hacer nada.
-  if (window.ResizeObserver) {
-    new ResizeObserver(congelarFondo).observe(document.querySelector("main"));
-  }
+  // A propósito NO se usa ResizeObserver. Si el fondo se re-midiera cada vez
+  // que la tarjeta cambia de alto, al pasar a alemán (textos más largos) la
+  // capa crecería y la imagen se reescalaría: eso producía un pequeño "zoom"
+  // visible en el móvil. El fondo se mide al arrancar, al terminar de cargar,
+  // cuando están las fuentes y al cambiar el tamaño de la ventana. Si la
+  // tarjeta crece después, la máscara del borde inferior hace que la
+  // diferencia no se note.
 
   // Al girar el móvil o cambiar el tamaño de la ventana
   let fondoResizeRaf;
