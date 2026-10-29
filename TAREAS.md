@@ -35,11 +35,11 @@
 |---|---|---|
 | **0** · Documentación | T0 | 1 / 1 |
 | **1** · Estructura | T1 – T3 | 3 / 3 |
-| **2** · Rendimiento y peso | T4 – T7 | 3 / 4 |
+| **2** · Rendimiento y peso | T4 – T7 | 4 / 4 |
 | **3** · Compartir e instalar | T8 – T9 | 2 / 2 |
 | **4** · Robustez y accesibilidad | T10 – T13 | 0 / 4 |
 | **5** · Publicación y seguridad | T14 – T15 | 0 / 2 |
-| **TOTAL** | **16 tareas** | **9 / 16** |
+| **TOTAL** | **16 tareas** | **10 / 16** |
 
 ---
 
@@ -160,7 +160,7 @@ T0  Documentación
 
 ### T5 · Autohospedar las fuentes (Inter y Cinzel)
 
-- **Estado:** 👀 Esperando tu OK
+- **Estado:** ✅ Completada (2026-10-29)
 - **Depende de:** T4 y D2
 - **Archivos:** `css/styles.css` (6 reglas `@font-face`), `assets/fonts/inter.woff2` + `cinzel-900.woff2` + 2 licencias OFL (nuevos), `index.html` (fuera los 2 `preconnect` y el `<link>` de Google, entra un `preload`)
 - **¿Por qué?** (1) **RGPD**: cargar Google Fonts envía la IP de cada visitante a Google, que en España/UE se considera incumplimiento; (2) **velocidad**: dos dominios menos que resolver y conectar; (3) **independencia**: la tarjeta ya no le pide nada a nadie, y si Google bloquea o cae, se sigue viendo igual.

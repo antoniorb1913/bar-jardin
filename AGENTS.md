@@ -280,6 +280,7 @@ Sin instalar nada (todo es relativo y no hay backend):
 3. Probar **siempre** en móvil simulado (DevTools, 390×844) **y** escritorio.
 4. Comprobar la consola: **debe estar limpia** (sin errores ni warnings nuevos).
 5. Pruebas mínimas en cada tarea: los 3 idiomas, recargar (persistencia), drawer abrir/cerrar, modal QR, copiar enlace, los 4 enlaces.
+6. **Aviso sobre abrir el archivo con doble clic (`file://`):** el navegador dará **errores de CORS** en el `preload` de la fuente y en `manifest.webmanifest`, porque no admite precargas ni manifests sin un origen `http`. **No son fallos del código:** la fuente se carga igual (aparece otra vez con 200 desde `styles.css`) y el manifest solo se usa al instalar la web. Para verlo limpio: `python3 -m http.server 8080` dentro de `bar-jardin/` y abrir `http://localhost:8080`.
 
 ---
 
@@ -298,7 +299,7 @@ Sin instalar nada (todo es relativo y no hay backend):
 | ID | Decisión | Bloquea | Estado |
 |---|---|---|---|
 | **D1** | **Dominio definitivo** | T7 (opción QR estático), T8 (metadatos sociales y `canonical`) — y **los QR que se impriman** | ✅ **RESUELTO (2026-10-29): `https://bareljardin-bolnuevo.netlify.app/`** — subdominio gratuito de Netlify, sin dominio propio. Verificado: responde 200. **Ojo:** un QR impreso fijaría esta dirección; si algún día se pasa a dominio propio, los QR ya impresos dejarían de funcionar. |
-| **D2** | ¿Se autohospedan las fuentes? Implica subir `.woff2` al repo (licencia OFL, permitido) | T5 | ⏳ **Pendiente.** No he recibido respuesta todavía. |
+| **D2** | ¿Se autohospedan las fuentes? Implica subir `.woff2` al repo (licencia OFL, permitido) | T5 | ✅ **RESUELTO (2026-10-29): sí.** Se autohospedan los mismos `.woff2` que servía Google. Ya no hay ningún tercero en la página. |
 
 > **URL canónica del proyecto:** `https://bareljardin-bolnuevo.netlify.app/`. Es la que deben usar `og:url`, `og:image` (absoluta), `canonical` y la URL del QR.
 

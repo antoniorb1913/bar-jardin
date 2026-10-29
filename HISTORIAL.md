@@ -56,6 +56,7 @@ Se añaden además los metadatos de la tarea: estado, rama, commit, archivos toc
 | T2 | Extraer el CSS a `css/styles.css` | 2026-10-29 | `refactor/t2-css-externo` |
 | T3 | Extraer el JS a `js/` y eliminar los `onclick` inline | 2026-10-29 | `refactor/t3-js-externo` |
 | T4 | Recortar las fuentes web cargadas | 2026-10-29 | `perf/t4-recorte-fuentes` |
+| T5 | Autohospedar las fuentes (Inter y Cinzel) | 2026-10-29 | `perf/t5-fuentes-locales` |
 | T6 | Mover las imágenes a `assets/img/` y optimizar `fondo.webp` | 2026-10-29 | `perf/t6-imagenes` |
 | T7 | Quitar el CDN del QR | 2026-10-29 | `perf/t7-qr-local` |
 | T8 | Metadatos para compartir y buscadores | 2026-10-29 | `feat/t8-metadatos` |
@@ -404,3 +405,41 @@ La imagen nueva tampoco es capricho: el logotipo mide 1200×501 (ratio 2,4:1) y 
 3. `og:image` y `twitter:image` empiezan por `https://` (no rutas relativas).
 4. Abrir `assets/img/og-image.jpg` en el navegador: es la imagen de la miniatura y mide 1200×630.
 5. **Pendiente para el despliegue:** cuando la web esté publicada, pegar la URL en un chat o validarla en `opengraph.xyz` debería mostrar imagen, título y descripción. Esta comprobación **no se puede hacer en local**, porque las redes leen el HTML publicado.
+
+---
+
+## 2026-10-29 · T5 — Autohospedar las fuentes (Inter y Cinzel)
+
+**Estado:** ✅ Completada y verificada por el usuario
+**Rama:** `perf/t5-fuentes-locales`
+**Commit:** `perf: autohospeda las fuentes y elimina Google Fonts`
+**Archivos:** `css/styles.css`, `assets/fonts/inter.woff2`, `assets/fonts/cinzel-900.woff2`, `OFL-Inter.txt`, `OFL-Cinzel.txt` (todos nuevos), `index.html`, `TAREAS.md`, `HISTORIAL.md`, `AGENTS.md`
+**Depende de:** T4 y D2
+
+### 1. ¿Qué he realizado?
+
+He descargado los **mismos archivos `.woff2` que servía Google Fonts**, los he guardado en `assets/fonts/` junto a su licencia SIL OFL 1.1, he añadido las **6 reglas `@font-face`** a `css/styles.css` y he quitado del `<head>` los dos `preconnect` y el `<link>` de Google, dejando un `preload`. **La tarjeta ya no le pide nada a ningún tercero.**
+
+### 2. ¿Por qué?
+
+- **RGPD:** cargar Google Fonts envía la IP de cada visitante a Google. Autohospedando, ese envío desaparece por completo. Para un negocio en España era un riesgo gratuito de eliminar.
+- **Velocidad:** dos dominios menos que resolver y conectar (`fonts.googleapis.com` y `fonts.gstatic.com`) y una hoja de estilos externa menos.
+- **Independencia:** si Google bloquea o cae, la tipografía se sigue viendo igual.
+- **El peso no cambia:** son los mismos ~61 KB.
+
+**Hallazgo que ahorró 190 KB:** Google sirve **los cinco pesos de Inter con el mismo archivo** (idénticos byte a byte, misma URL). Por eso el repo guarda **un** `inter.woff2` de 48 KB en lugar de cinco copias, y **un solo `preload` cubre todos los pesos**.
+
+### 3. ¿Dónde verlo en el código?
+
+- `assets/fonts/inter.woff2` (48,3 KB), `assets/fonts/cinzel-900.woff2` (14,8 KB), `OFL-Inter.txt` y `OFL-Cinzel.txt`.
+- `css/styles.css:1-62` — las 6 reglas `@font-face`, con `font-display: swap` y el `unicode-range` exacto que servía Google.
+- `index.html` — el `preload` de `inter.woff2` (`as="font"`, `type="font/woff2"`, `crossorigin`).
+- Ya no queda ninguna referencia a `fonts.googleapis.com` ni `fonts.gstatic.com` en todo el proyecto.
+
+### 4. ¿Cómo comprobar que funciona?
+
+1. Abrir la tarjeta con `Ctrl+F5`: se ve **idéntica** (son los mismos archivos).
+2. `F12` → Network → filtro *Font*: `inter.woff2` responde 200 **desde tu dominio**; ninguna petición a Google.
+3. Consola: `document.fonts.check('16px Inter')` → `true`.
+4. Abrir el modal QR: carga `cinzel-900.woff2` y el título se ve igual.
+5. **Aviso:** abriendo el archivo con doble clic (`file://`), el navegador marca **CORS** en el `preload` de la fuente y en `manifest.webmanifest`. **No es un fallo:** la fuente se carga igual (aparece otra vez con 200 desde `styles.css`) y el manifest solo se usa al instalar la web. Se comprueba limpio con `python3 -m http.server 8080` y `http://localhost:8080`.
