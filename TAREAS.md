@@ -37,9 +37,9 @@
 | **1** · Estructura | T1 – T3 | 3 / 3 |
 | **2** · Rendimiento y peso | T4 – T7 | 4 / 4 |
 | **3** · Compartir e instalar | T8 – T9 | 2 / 2 |
-| **4** · Robustez y accesibilidad | T10 – T13 | 2 / 4 |
+| **4** · Robustez y accesibilidad | T10 – T13 | 3 / 4 |
 | **5** · Publicación y seguridad | T14 – T15 | 0 / 2 |
-| **TOTAL** | **16 tareas** | **12 / 16** |
+| **TOTAL** | **16 tareas** | **13 / 16** |
 
 ---
 
@@ -266,7 +266,7 @@ T0  Documentación
 
 ### T12 · Cálculo de horario con `Intl.DateTimeFormat`
 
-- **Estado:** 👀 Esperando tu OK
+- **Estado:** ✅ Completada (2026-10-29)
 - **Depende de:** T3
 - **Archivos:** `js/horario.js` (nueva `ahoraEnMadrid()` y `FORMATO_MADRID`)
 - **¿Por qué?** El método anterior (`toLocaleString("en-US")` + `new Date(...)`) **construía una fecha a partir de un texto** y dependía de cómo cada navegador interprete ese formato. Ahora se usa `Intl.DateTimeFormat(..., { timeZone: "Europe/Madrid", hourCycle: "h23" }).formatToParts()`, que es la API pensada exactamente para esto: devuelve las partes ya convertidas, sin conversiones implícitas. El día de la semana se calcula con la fecha **ya convertida a Madrid** y en UTC, así que la zona horaria del visitante no influye.
@@ -288,12 +288,13 @@ T0  Documentación
 
 ### T13 · Imágenes sin salto de layout
 
-- **Estado:** ⏳ Pendiente
+- **Estado:** 👀 Esperando tu OK
 - **Depende de:** T3
-- **Archivos:** `index.html` (`width`, `height`, `decoding="async"`), `css/styles.css` (`height: auto` donde corresponda)
-- **¿Por qué?** Sin `width`/`height`, el navegador no sabe cuánto espacio reservar y la tarjeta **salta** mientras cargan las imágenes, sobre todo en 3G/4G lento. Añadirlos reserva el hueco desde el primer instante.
+- **Archivos:** `index.html` (las tres etiquetas `<img>`)
+- **¿Por qué?** Sin `width`/`height`, el navegador no sabe cuánto espacio reservar hasta que la imagen llega. **El caso que de verdad importa es el logo**: su CSS es `width: 100%; height: auto`, así que sin la proporción declarada la tarjeta reserva una altura distinta y **salta** al cargar. El fondo y la palmera tienen tamaño fijo por CSS, así que en ellos los atributos son solo corrección (no cambian nada).
+- **Detalle importante:** los valores declarados son **exactamente** los tamaños reales (1200×501 el logo, 560×846 el fondo, 120×120 la palmera). Si no coincidieran, el navegador reservaría un hueco equivocado y el salto sería *peor* que no ponerlos.
 - **¿Cómo comprobar?**
-  1. DevTools → Network → throttling **"Slow 3G"** → recargar: no hay saltos; el hueco está reservado.
+  1. DevTools → Network → throttling **"Slow 3G"** → recargar: la tarjeta **no salta**; el hueco del logo está reservado desde el principio.
   2. Lighthouse → **CLS < 0,1** (idealmente 0).
   3. Con la página cargada, **todo se ve exactamente igual** que antes.
   4. El fondo sigue sin hacer zoom al desplegar los horarios.
