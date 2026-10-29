@@ -1,0 +1,335 @@
+# TAREAS.md — Bar El Jardín · Tarjeta digital
+
+**Proyecto:** Bar El Jardín — Bolnuevo (Mazarrón, Murcia)
+**Carpeta:** `bar-jardin/`
+**Última actualización:** 2026-10-29
+**Flujo de trabajo:** ver `AGENTS.md` §5.
+
+> **REGLA DE ORO:** ninguna tarea pasa a ✅ sin que el usuario responda **«sí»** a la pregunta **«¿Todo OK?»**.
+> Y al pasar a ✅, **se registra obligatoriamente en `HISTORIAL.md`**.
+
+---
+
+## 1. Cómo se usa este archivo
+
+1. Solo hay **una tarea en 🔧 En curso** a la vez.
+2. Al terminar, el agente la marca **👀 Esperando tu OK**, te dice cómo comprobarla y te pregunta **«¿Todo OK?»**.
+3. Si respondes **sí** → **✅ Completada** + entrada en `HISTORIAL.md` + instrucciones para subirlo a GitHub.
+4. Si algo falla → vuelve a **🔧 En curso**, se corrige y se repite la comprobación.
+
+### Leyenda
+
+| Icono | Estado | Significado |
+|---|---|---|
+| ⏳ | Pendiente | Sin empezar |
+| 🔧 | En curso | El agente está trabajándola |
+| 👀 | Esperando tu OK | Terminada, pendiente de tu verificación |
+| ✅ | Completada | Verificada por ti y registrada en `HISTORIAL.md` |
+| ⛔ | Bloqueada | Espera una decisión tuya (ver §3) |
+
+---
+
+## 2. Resumen de progreso
+
+| Fase | Tareas | Completadas |
+|---|---|---|
+| **0** · Documentación | T0 | 1 / 1 |
+| **1** · Estructura | T1 – T3 | 0 / 3 |
+| **2** · Rendimiento y peso | T4 – T7 | 0 / 4 |
+| **3** · Compartir e instalar | T8 – T9 | 0 / 2 |
+| **4** · Robustez y accesibilidad | T10 – T13 | 0 / 4 |
+| **5** · Publicación y seguridad | T14 – T15 | 0 / 2 |
+| **TOTAL** | **16 tareas** | **1 / 16** |
+
+---
+
+## 3. Decisiones pendientes (bloquean tareas)
+
+| ID | Decisión | Bloquea | Estado |
+|---|---|---|---|
+| **D1** | **Dominio definitivo** (`algo.netlify.app` o dominio propio) | T7 (opción B), T8 | ⏳ Sin decidir |
+| **D2** | **¿Autohospedar las fuentes?** (subir `.woff2` al repo; licencia OFL lo permite) | T5 | ⏳ Sin decidir (recomendado: sí) |
+
+---
+
+## 4. Orden de ejecución y dependencias
+
+```
+T0  Documentación
+ └─ T1  Migrar el proyecto a bar-jardin
+     ├─ T2  Extraer el CSS
+     │   └─ T3  Extraer el JS + quitar onclick inline
+     │       ├─ T4  Recortar fuentes web
+     │       │   └─ T5  Autohospedar fuentes          [D2]
+     │       ├─ T6  Imágenes a assets/img + recompresión
+     │       ├─ T7  Quitar el CDN del QR              [D1 opcional]
+     │       ├─ T8  Metadatos sociales                [D1] ⛔
+     │       ├─ T9  Iconos e instalación
+     │       ├─ T10 Robustez (localStorage, portapapeles)
+     │       ├─ T11 Accesibilidad (lang, aria, modal)
+     │       ├─ T12 Horario con Intl
+     │       └─ T13 Imágenes sin salto de layout
+     │           └─ T14 Netlify: netlify.toml + _headers (requiere T3, T5, T7)
+     │               └─ T15 Verificación final integral
+```
+
+---
+
+# FASE 0 — Documentación
+
+### T0 · Documentación y contrato de trabajo
+
+- **Estado:** ✅ Completada (2026-10-29)
+- **Depende de:** —
+- **Archivos:** `AGENTS.md`, `TAREAS.md`, `HISTORIAL.md` (nuevos)
+- **¿Por qué?** Fijar las reglas de trabajo, el contexto del proyecto y el orden de las tareas antes de tocar una sola línea de código. Sin esto, cada sesión empieza de cero y se pierde el hilo de lo que se ha hecho y por qué.
+- **¿Cómo comprobar?**
+  1. Existen los tres archivos dentro de `bar-jardin/`.
+  2. `AGENTS.md` contiene: ficha del proyecto, tus 5 reglas, el flujo obligatorio, el stack permitido/prohibido, la estructura objetivo, el contrato de no regresión, las reglas de calidad y las decisiones pendientes.
+  3. `TAREAS.md` lista las 16 tareas agrupadas por fases, con dependencias.
+  4. `HISTORIAL.md` tiene la plantilla con los 4 puntos que pediste.
+  5. **Ningún archivo del sitio se ha tocado**: `SUBIR-A-NETLIFY/index.html` sigue idéntico.
+- **Nota:** la copia de la web a `bar-jardin/` corresponde a la tarea T1.
+
+---
+
+# FASE 1 — Estructura
+
+### T1 · Migrar el proyecto a `bar-jardin` (copia literal)
+
+- **Estado:** 👀 Esperando tu OK
+- **Depende de:** T0
+- **Archivos:** crea `index.html`, `logo.png`, `palmera.png`, `fondo.webp` en `bar-jardin/`
+- **¿Por qué?** `bar-jardin/` debe ser la **única fuente de verdad** y la raíz que publica Netlify. Hoy hay tres copias del proyecto (raíz del workspace, `SUBIR-A-NETLIFY/` y el `.zip`): es la receta perfecta para editar el archivo equivocado y desplegar el otro.
+- **¿Cómo comprobar?**
+  1. Los 4 archivos existen en `bar-jardin/`.
+  2. El hash de cada uno coincide con su original (`Get-FileHash`): contenido **idéntico byte a byte**.
+  3. Abrir `bar-jardin/index.html` en el navegador: la tarjeta es exactamente igual.
+  4. DevTools en móvil (390×844): igual.
+  5. `SUBIR-A-NETLIFY/` sigue intacta (se conserva como respaldo hasta T15).
+
+### T2 · Extraer el CSS a `css/styles.css`
+
+- **Estado:** ⏳ Pendiente
+- **Depende de:** T1
+- **Archivos:** `index.html` (se elimina el bloque `<style>`, líneas 21–781), nuevo `css/styles.css`
+- **¿Por qué?** Un `index.html` de 1.343 líneas con 23 KB de CSS en medio es incómodo de mantener, no se cachea aparte y **no permite aplicar una CSP estricta** (con `<style>` inline habría que permitir `'unsafe-inline'`, que anula la protección).
+- **¿Cómo comprobar?**
+  1. `index.html` ya no contiene ninguna etiqueta `<style>`.
+  2. En `<head>` hay `<link rel="stylesheet" href="css/styles.css">`.
+  3. El contenido de `css/styles.css` es **exactamente** el que estaba entre `<style>` y `</style>` (mismos valores, sin reordenar).
+  4. Al abrir la página: idéntica, sin parpadeo de "contenido sin estilos" (recarga con `Ctrl+F5`).
+  5. DevTools → Network: `styles.css` responde 200.
+  6. Consola sin errores.
+
+### T3 · Extraer el JS a `js/` y eliminar los `onclick` inline
+
+- **Estado:** ⏳ Pendiente
+- **Depende de:** T2
+- **Archivos:** `index.html` (fuera el `<script>` de las líneas 1046–1341 y los **8 `onclick`**), nuevos `js/i18n.js`, `js/horario.js`, `js/app.js`
+- **¿Por qué?** Es la única forma de cerrar la CSP a `script-src 'self'` (los `onclick=` obligan a `'unsafe-inline'`), y separa responsabilidades: traducciones / lógica de horario / interfaz y arranque.
+- **⚠️ Riesgo conocido:** hoy `changeLanguage()` se ejecuta en la línea 1201 y llama a `congelarFondo()` usando `fondoIniciado`, declarado más abajo (línea 1295). Al repartir el código en archivos, el arranque **debe** centralizarse en un `init()` al final de `app.js`, dentro de `DOMContentLoaded`, y los `<script>` deben ir con `defer` en orden: `i18n.js` → `horario.js` → `app.js`.
+- **¿Cómo comprobar?**
+  1. En `index.html` no queda ningún `onclick=`. En consola: `document.querySelectorAll('[onclick]').length` devuelve **0**.
+  2. Los tres scripts se cargan con `defer` y en el orden correcto (DevTools → Network / Elements).
+  3. Consola con **cero errores**.
+  4. **Idiomas:** los 3 botones cambian todos los textos; al recargar se mantiene el elegido.
+  5. **Badge:** sigue mostrando Abierto/Cerrado según la hora real.
+  6. **Drawer:** abre y cierra; el chevron gira; `aria-expanded` pasa de `false` a `true`.
+  7. **Modal QR:** abre, dibuja el QR, cierra con ✕ y al hacer clic en el fondo oscuro.
+  8. **Copiar enlace:** sale el toast.
+  9. **Enlaces:** Maps, reseñas, Instagram y Facebook abren en pestaña nueva.
+  10. **Fondo:** al desplegar los horarios, la imagen **no hace zoom**.
+
+---
+
+# FASE 2 — Rendimiento y peso
+
+### T4 · Recortar las fuentes web cargadas
+
+- **Estado:** ⏳ Pendiente
+- **Depende de:** T3
+- **Archivos:** `index.html` (línea 16, el `<link>` de Google Fonts)
+- **¿Por qué?** Se pide **Playfair Display**, que **no se usa en ninguna regla del CSS** (descarga desperdiciada). Y de **Cinzel** se piden 3 pesos (600, 700, 900) cuando solo se usa **una vez**, en el título del modal QR, a **900**. Las fuentes son hoy la descarga más pesada del sitio: más que el HTML, el CSS, el JS y las imágenes juntos.
+- **¿Cómo comprobar?**
+  1. El `<link>` queda solo con `Cinzel:wght@900` e `Inter:wght@400;500;600;700;800`.
+  2. DevTools → Network → filtrar `font`: ya no aparece ninguna fuente `Playfair`.
+  3. El título del modal QR ("BAR EL JARDÍN") sigue con la misma tipografía y el mismo grosor.
+  4. El resto de textos se ven igual (Inter).
+  5. Comparación visual antes/después: **sin diferencias**.
+
+### T5 · Autohospedar las fuentes (INTER y CINZEL) — ⛔ requiere D2
+
+- **Estado:** ⛔ Bloqueada por D2
+- **Depende de:** T4
+- **Archivos:** `css/styles.css` (`@font-face`), `assets/fonts/*.woff2`, `assets/fonts/OFL.txt`, `index.html` (quita `preconnect` y el `<link>` de Google, añade `preload`)
+- **¿Por qué?** Dos motivos: (1) **RGPD** — cargar Google Fonts envía la IP de cada visitante a Google y en España/UE eso se considera un incumplimiento; para un negocio español es un riesgo evitable; (2) **velocidad** — dos dominios menos que resolver y conectar.
+- **¿Cómo comprobar?**
+  1. Network: **cero** peticiones a `fonts.googleapis.com` y `fonts.gstatic.com`; los `.woff2` se sirven desde tu dominio.
+  2. La tipografía se ve **idéntica** (mismos archivos `woff2` que servía Google → render igual).
+  3. Consola: `document.fonts.check('16px Inter')` devuelve `true`.
+  4. Sin parpadeo de fuente (FOUT) gracias a `font-display: swap` + `preload`.
+  5. Funciona **sin conexión a internet** una vez cargada la página (salvo enlaces externos).
+
+### T6 · Mover las imágenes a `assets/img/` y recomprimir `fondo.webp`
+
+- **Estado:** ⏳ Pendiente
+- **Depende de:** T3
+- **Archivos:** `assets/img/logo.png`, `assets/img/palmera.png`, `assets/img/fondo.webp`, `index.html` (rutas `src`)
+- **¿Por qué?** Las tres imágenes quedan en la raíz porque T1 es una copia literal; en cuanto se puedan tocar las rutas, pasan a `assets/img/` como pide `AGENTS.md` §4. Y el fondo son **103 KB** para una imagen que se muestra al **14 % de opacidad** y con una máscara que la desvanece por abajo: es, con diferencia, el archivo más pesado del sitio y se nota muchísimo menos de lo que pesa.
+- **¿Cómo comprobar?**
+  1. Peso final: **≈ 25–35 KB** (antes 103 KB).
+  2. Dimensiones **iguales** (800×1209) para que el recorte (`object-fit: cover`, `object-position: right bottom`) no cambie.
+  3. Comparar con la versión anterior: **sobre todo la esquina inferior derecha**, donde se ve más. No deben aparecer bandas ni bloques en las zonas de degradado.
+  4. Abrir y cerrar el desplegable de horarios: el fondo sigue sin hacer zoom.
+  5. Tras el traslado, las tres imágenes cargan sin ningún 404 (DevTools → Network) y la tarjeta se ve idéntica.
+
+### T7 · Quitar el CDN del QR
+
+- **Estado:** ⏳ Pendiente
+- **Depende de:** T3
+- **Archivos:** `index.html` (línea 19), nuevo `js/vendor/qrcode.min.js`
+- **¿Por qué?** `cdnjs.cloudflare.com` es un **script de terceros**: si ese CDN se compromete, ejecuta código en tu página. Además `qrcodejs 1.0.0` es de **2012**, sin mantenimiento, y tener un tercero en `script-src` impide cerrar la CSP. Autohospedarlo cuesta lo mismo (un archivo) y elimina el riesgo.
+- **¿Cómo comprobar?**
+  1. Network: **ninguna** petición a `cdnjs.cloudflare.com`.
+  2. El modal QR dibuja el QR como antes.
+  3. **Escanearlo con el móvil de verdad** y comprobar que abre la URL correcta.
+  4. Cerrar y volver a abrir el modal: el QR no se duplica ni parpadea.
+  5. Consola sin errores.
+- **Opción B (solo si D1 está decidido):** generar un `qr.svg` estático y **eliminar la librería entera** (el QR funcionaría incluso sin JavaScript).
+
+---
+
+# FASE 3 — Compartir e instalar
+
+### T8 · Metadatos para compartir en WhatsApp y redes — ⛔ requiere D1
+
+- **Estado:** ⛔ Bloqueada por D1
+- **Depende de:** T3
+- **Archivos:** `index.html` (`<head>`), nuevo `assets/img/og-image.jpg` (1200×630)
+- **¿Por qué?** `og:image` es hoy `"logo.png"`, una **ruta relativa**. WhatsApp, Telegram, Instagram y Facebook exigen **URL absoluta** para la miniatura: tal como está, **al compartir la tarjeta no sale imagen**. Y esta tarjeta se comparte precisamente por WhatsApp — es su razón de existir. Se añaden además `og:url`, `og:type`, `twitter:card`, `meta description`, `canonical` y `theme-color`.
+- **¿Cómo comprobar?**
+  1. Pegar la URL en un chat de WhatsApp Web (o Telegram): aparece **imagen + título + descripción**.
+  2. Validar en `https://www.opengraph.xyz` o el depurador de Facebook: todo correcto.
+  3. En DevTools → Elements, comprobar que las etiquetas nuevas están en `<head>`.
+  4. La tarjeta en sí **no cambia** en nada.
+
+### T9 · Iconos e instalación en el móvil
+
+- **Estado:** ⏳ Pendiente
+- **Depende de:** T3
+- **Archivos:** `index.html` (`<head>`), `manifest.webmanifest`, `assets/icons/` (favicon 32, apple-touch-icon 180, iconos 192 y 512)
+- **¿Por qué?** Cuando un cliente hace "Añadir a pantalla de inicio", ahora sale una **captura de pantalla** como icono y sin nombre. Con iconos propios y un `manifest` sale el logo del bar con su nombre: parece una app y se reconoce de un vistazo.
+- **¿Cómo comprobar?**
+  1. En Android (Chrome) y iPhone (Safari) → "Añadir a pantalla de inicio": aparece el **logo** y el nombre "El Jardín".
+  2. DevTools → Application → Manifest: sin errores ni avisos.
+  3. La pestaña del navegador muestra el favicon.
+
+---
+
+# FASE 4 — Robustez y accesibilidad
+
+### T10 · Robustez: `localStorage`, portapapeles y `innerHTML`
+
+- **Estado:** ⏳ Pendiente
+- **Depende de:** T3
+- **Archivos:** `js/i18n.js`, `js/app.js`
+- **¿Por qué?**
+  - **Bug real:** la línea 1113 (`let currentLang = localStorage.getItem(...) || "es"`) no tiene `try/catch`. Si el navegador bloquea el almacenamiento (Safari en modo privado, cookies bloqueadas, navegadores dentro de apps), **muere todo el script**: el badge se queda para siempre en *"Consultando..."* y no funcionan ni el QR ni el desplegable.
+  - `document.execCommand("copy")` está **obsoleto**: se sustituye por `navigator.clipboard`, manteniendo el método antiguo como respaldo.
+  - El footer se escribe con `innerHTML`: debe ser `textContent`.
+- **¿Cómo comprobar?**
+  1. **Prueba de bloqueo:** en Chrome, Configuración → Privacidad → Cookies → *Bloquear todas* → recargar. La tarjeta debe seguir **completa y funcional**: badge con Abierto/Cerrado (no "Consultando..."), idiomas, drawer, QR y copiar.
+  2. Volver a permitir cookies → recargar → el idioma elegido **se recuerda**.
+  3. Pulsar "copiar enlace" → aparece el toast → pegar con `Ctrl+V` en el bloc de notas: la URL es la correcta.
+  4. En consola no hay errores sin capturar.
+
+### T11 · Accesibilidad: idioma, `aria` y modal
+
+- **Estado:** ⏳ Pendiente
+- **Depende de:** T3
+- **Archivos:** `js/*.js`, `index.html` (atributos)
+- **¿Por qué?** `<html lang="es">` **nunca cambia**: al pasar a inglés o alemán, los lectores de pantalla siguen leyendo con fonética española y Google indexa mal. Además el modal **no se cierra con `Escape`, no atrapa el foco y no bloquea el scroll** del fondo, y el toast no se anuncia.
+- **¿Cómo comprobar?**
+  1. Cambiar a inglés → DevTools → Elements: `<html lang="en">`. A alemán → `lang="de"`. Volver a español → `es`.
+  2. Navegar con `Tab` hasta las banderas: se ve el foco y `aria-pressed` cambia a `true` en la activa.
+  3. Abrir el modal QR → pulsar `Tab` varias veces: el foco **no sale** del modal. Pulsar `Escape`: se cierra y el foco vuelve al botón del QR. Con el modal abierto, la página del fondo **no hace scroll**.
+  4. El toast tiene `aria-live="polite"` (visible en Elements).
+  5. **Visualmente todo sigue igual.**
+
+### T12 · Cálculo de horario con `Intl.DateTimeFormat`
+
+- **Estado:** ⏳ Pendiente
+- **Depende de:** T3
+- **Archivos:** `js/horario.js`
+- **¿Por qué?** El método actual (`toLocaleString("en-US")` + `new Date(...)`) funciona, pero depende de cómo cada navegador interprete ese texto de fecha. `Intl.DateTimeFormat(..., { timeZone: "Europe/Madrid" }).formatToParts()` es la API pensada exactamente para esto: misma lógica, sin conversiones implícitas y sin sorpresas entre navegadores.
+- **¿Cómo comprobar?** Cambiando la hora del sistema (recordar volver a poner la hora automática después) y recargando:
+
+  | Día y hora | Debe mostrar |
+  |---|---|
+  | Domingo 15:59 | Cerrado |
+  | Domingo 16:00 | Abierto |
+  | Domingo 22:59 | Abierto |
+  | Domingo 23:00 | Cerrado |
+  | Viernes 23:59 | Abierto |
+  | Sábado 23:59 | Abierto |
+  | Domingo 00:00 | Cerrado |
+  | Lunes 12:00 | Cerrado |
+
+  Y con la hora real: el badge coincide con la realidad (última comprobación).
+
+### T13 · Imágenes sin salto de layout
+
+- **Estado:** ⏳ Pendiente
+- **Depende de:** T3
+- **Archivos:** `index.html` (`width`, `height`, `decoding="async"`), `css/styles.css` (`height: auto` donde corresponda)
+- **¿Por qué?** Sin `width`/`height`, el navegador no sabe cuánto espacio reservar y la tarjeta **salta** mientras cargan las imágenes, sobre todo en 3G/4G lento. Añadirlos reserva el hueco desde el primer instante.
+- **¿Cómo comprobar?**
+  1. DevTools → Network → throttling **"Slow 3G"** → recargar: no hay saltos; el hueco está reservado.
+  2. Lighthouse → **CLS < 0,1** (idealmente 0).
+  3. Con la página cargada, **todo se ve exactamente igual** que antes.
+  4. El fondo sigue sin hacer zoom al desplegar los horarios.
+
+---
+
+# FASE 5 — Publicación y seguridad
+
+### T14 · Configuración de Netlify y cabeceras de seguridad
+
+- **Estado:** ⏳ Pendiente
+- **Depende de:** **T3, T5 y T7** (si no, la CSP rompe la página)
+- **Archivos:** `netlify.toml`, `_headers`, `robots.txt`, `404.html`, `README.md`, `.gitignore`
+- **¿Por qué?** Aquí es donde se recoge el fruto de todo lo anterior: con el JS y el CSS ya en archivos y sin CDNs, se puede aplicar una **CSP estricta** (`default-src 'self'`, sin `'unsafe-inline'`) que bloquee de verdad cualquier script inyectado. Se añaden `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` (bloquear cámara, micrófono y geolocalización) y `X-Frame-Options`. Y `Cache-Control: immutable` para los assets → visitas repetidas casi instantáneas.
+- **¿Cómo comprobar?**
+  1. Tras desplegar: `https://securityheaders.com` → nota **A**.
+  2. DevTools → Network → cabeceras de `index.html`: la CSP aparece. En `css/styles.css`: `cache-control: public, max-age=31536000, immutable`.
+  3. Consola **sin violaciones de CSP** (si hay alguna, es un fallo de esta tarea).
+  4. Una URL inventada (`/loquesea`) muestra la **404 propia**, con el estilo de la tarjeta.
+  5. `/robots.txt` responde.
+  6. El sitio sigue funcionando exactamente igual que antes.
+
+### T15 · Verificación final integral
+
+- **Estado:** ⏳ Pendiente
+- **Depende de:** todas las anteriores
+- **Archivos:** ninguno (solo verificación; se corrigen detalles si aparecen)
+- **¿Por qué?** Lo último que se revisa son las **piezas sueltas**, no el conjunto. Esta tarea comprueba que la suma de los cambios no ha roto nada, comparando contra la versión original.
+- **¿Cómo comprobar?**
+  1. **Comparación lado a lado** con `SUBIR-A-NETLIFY/index.html`: móvil (390 px) y escritorio, en los 3 idiomas, con el desplegable abierto y cerrado, y con el modal QR abierto. **Sin diferencias visuales.**
+  2. Checklist funcional completo: banderas + persistencia · badge abierto/cerrado · drawer + chevron + `aria-expanded` · modal (abrir, ✕, clic en fondo, `Escape`) · copiar enlace + toast · los 4 enlaces en pestaña nueva · QR escaneado con un móvil real · fondo sin zoom.
+  3. Consola limpia en todas las vistas.
+  4. Lighthouse móvil: **Rendimiento ≥ 95**, **Accesibilidad ≥ 95**, **Buenas prácticas ≥ 95**, **SEO ≥ 95**.
+  5. Peso total de la primera carga y comparación con el punto de partida (objetivo: menos de la mitad de fuentes y ~30 % menos de imágenes).
+
+---
+
+## 5. Ideas futuras (NO planificadas)
+
+Sin fecha y sin compromiso. Solo para no olvidarlas:
+
+- Analítica sin cookies (Netlify Analytics o similar) — si se añade, revisar RGPD y añadir aviso legal.
+- Botón de llamada directa al bar.
+- Enlace a la carta en PDF o como página.
+- Aviso de eventos / "hoy hay…".
+- Horario de cocina separado del de barra.
+- Tema oscuro respetando `prefers-color-scheme`.
