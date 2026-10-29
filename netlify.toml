@@ -6,6 +6,31 @@
 [build]
   publish = "."
 
+# --- La documentación interna NO se publica ---
+# El sitio se publica desde la raíz del repositorio, así que sin esto
+# documentos como AGENTS.md quedarían accesibles en tudominio/AGENTS.md.
+# Estas reglas los mandan a la 404.
+
+[[redirects]]
+  from = "/AGENTS.md"
+  to = "/404.html"
+  status = 404
+
+[[redirects]]
+  from = "/TAREAS.md"
+  to = "/404.html"
+  status = 404
+
+[[redirects]]
+  from = "/HISTORIAL.md"
+  to = "/404.html"
+  status = 404
+
+[[redirects]]
+  from = "/netlify.toml"
+  to = "/404.html"
+  status = 404
+
 # Si algún día se cambia de dominio, aquí se añadiría el redirect permanente
 # para no romper los QR ya impresos:
 #
