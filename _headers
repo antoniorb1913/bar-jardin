@@ -1,0 +1,40 @@
+# Cabeceras HTTP — Bar El Jardín
+# Formato de Netlify: https://docs.netlify.com/routing/headers/
+
+/*
+  # --- Seguridad ---
+  # Política estricta: TODO se carga del propio dominio. Sin 'unsafe-inline'
+  # ni 'unsafe-eval', así que un script inyectado no podría ejecutarse.
+  # - img-src data: es necesario porque la librería del QR dibuja un <canvas>
+  #   y lo convierte en una imagen data:.
+  Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; font-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; upgrade-insecure-requests
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()
+  Cross-Origin-Opener-Policy: same-origin
+  # El filtro XSS antiguo se desactiva a propósito: está retirado y los
+  # navegadores modernos ya no lo necesitan.
+  X-XSS-Protection: 0
+
+# --- Caché ---
+# Los archivos de assets no cambian: un año, sin revalidar.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/css/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/js/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# El HTML y la raíz se revalidan siempre: un cambio se ve al instante.
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+# El manifest puede cambiar si se tocan los iconos: un día.
+/manifest.webmanifest
+  Cache-Control: public, max-age=86400

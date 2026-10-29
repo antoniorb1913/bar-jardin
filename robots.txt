@@ -1,0 +1,5 @@
+# Bar El Jardín — Bolnuevo
+User-agent: *
+Allow: /
+
+Sitemap: https://bareljardin-bolnuevo.netlify.app/sitemap.xml
