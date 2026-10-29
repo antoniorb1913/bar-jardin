@@ -34,12 +34,12 @@
 | Fase | Tareas | Completadas |
 |---|---|---|
 | **0** · Documentación | T0 | 1 / 1 |
-| **1** · Estructura | T1 – T3 | 1 / 3 |
+| **1** · Estructura | T1 – T3 | 2 / 3 |
 | **2** · Rendimiento y peso | T4 – T7 | 0 / 4 |
 | **3** · Compartir e instalar | T8 – T9 | 0 / 2 |
 | **4** · Robustez y accesibilidad | T10 – T13 | 0 / 4 |
 | **5** · Publicación y seguridad | T14 – T15 | 0 / 2 |
-| **TOTAL** | **16 tareas** | **2 / 16** |
+| **TOTAL** | **16 tareas** | **3 / 16** |
 
 ---
 
@@ -110,7 +110,7 @@ T0  Documentación
 
 ### T2 · Extraer el CSS a `css/styles.css`
 
-- **Estado:** 👀 Esperando tu OK
+- **Estado:** ✅ Completada (2026-10-29)
 - **Depende de:** T1
 - **Archivos:** `index.html` (se elimina el bloque `<style>`, líneas 21–781), nuevo `css/styles.css` (759 líneas, 15,9 KB)
 - **¿Por qué?** Un `index.html` de 1.343 líneas con 18 KB de CSS en medio es incómodo de mantener, no se cachea aparte y **no permite aplicar una CSP estricta** (con `<style>` inline habría que permitir `'unsafe-inline'`, que anula la protección).

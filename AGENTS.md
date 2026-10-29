@@ -129,6 +129,7 @@ Este ciclo **no se salta nunca**. Cada tarea, una vuelta completa.
    - y la pregunta literal: **«¿Todo OK?»**
 5. **Parar y esperar.** No se avanza a la siguiente tarea bajo ningún concepto.
 6. Cuando el usuario responde **«sí»**:
+   - **comprobar que todo está bien subido** e informar de lo que falte (ver §7.1),
    - marcar **✅ Completada** en `TAREAS.md`,
    - añadir la entrada correspondiente en `HISTORIAL.md`,
    - indicar **qué subir a GitHub** (rama propuesta, mensaje de commit y archivos) y **cuándo hacerlo**.
@@ -185,6 +186,33 @@ Formato:
   5. Una **descripción breve para el Pull Request**.
 - Ramas: `tipo/tn-descripcion-corta` → PR a `main`. Una rama y un PR por tarea.
 - Nunca proponer `git push --force` ni commits directos a `main`.
+
+### 7.1 Comprobación obligatoria al recibir «¿Todo OK?» → «sí» (REGLA 6)
+
+> **Regla del usuario:** cada vez que responda **«sí»** a «¿Todo OK?», el agente comprueba **que todo está bien subido** y avisa de lo que falte. Sin excepciones.
+
+Se revisa, en este orden:
+
+1. **Rama actual** (`HEAD`) y si es la que corresponde a la tarea.
+2. **Archivos rastreados** por git frente a los que hay en disco: si un archivo de la tarea existe pero **no está rastreado**, falta `git add` (el error más común).
+3. **Cambios sin comitear**: si un archivo rastreado tiene fecha de modificación posterior a la de `.git/index`, probablemente no está comiteado.
+4. **Commits sin subir**: si la rama local apunta a un commit que `origin/` no tiene, falta `git push`.
+5. **PR y merge**: si la rama de la tarea existe en `origin` y si `main` ya la ha incorporado; y si `main` local apunta al mismo commit que `origin/main`.
+6. **Registro incluido**: que `TAREAS.md` (✅) y `HISTORIAL.md` (entrada con los 4 puntos) formen parte de lo subido, no solo del disco.
+
+Y se informa con esta tabla:
+
+| Comprobación | Estado |
+|---|---|
+| Rama de la tarea subida | ✅ / ⚠️ |
+| Archivos de la tarea rastreados | ✅ / ⚠️ |
+| PR mergeado en `main` | ✅ / ⚠️ |
+| `main` local al día | ✅ / ⚠️ |
+| Tablero e historial incluidos | ✅ / ⚠️ |
+
+Si algo está ⚠️, el agente dice **exactamente qué comando falta** y **no da la tarea por subida**.
+
+**Cómo lo comprueba sin ejecutar git** (la gestión de git sigue siendo del usuario): leyendo en **solo lectura** los metadatos de `.git/` — `HEAD`, `refs/`, `packed-refs`, `logs/HEAD` e `index` —. Nunca escribe nada ahí. Si el usuario prefiere, puede pegar el resultado de `git status` y el agente lo usa como fuente.
 
 ---
 
@@ -291,3 +319,4 @@ Sin instalar nada (todo es relativo y no hay backend):
 | Fecha | Cambio |
 |---|---|
 | 2026-10-29 | Versión inicial. Ficha del proyecto, 5 reglas del usuario, flujo obligatorio, stack, estructura, contrato de no regresión y convenciones. |
+| 2026-10-29 | Añadida la **REGLA 6** (§7.1): al recibir «¿Todo OK?» → «sí», comprobar que todo está bien subido e informar de lo que falte. Corregidas las medidas reales del CSS (18,1 KB) y del JS (11,5 KB). |

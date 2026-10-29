@@ -53,6 +53,7 @@ Se añaden además los metadatos de la tarea: estado, rama, commit, archivos toc
 |---|---|---|---|
 | T0 | Documentación y contrato de trabajo | 2026-10-29 | `docs/t0-documentacion-base` |
 | T1 | Migrar el proyecto a `bar-jardin` (copia literal) | 2026-10-29 | `chore/t1-copia-proyecto` |
+| T2 | Extraer el CSS a `css/styles.css` | 2026-10-29 | `refactor/t2-css-externo` |
 
 ---
 
@@ -137,3 +138,42 @@ Porque había tres copias del proyecto (raíz del workspace, `SUBIR-A-NETLIFY/` 
 4. Consola del navegador (`F12`): sin errores en rojo.
 5. `git ls-files` dentro de `bar-jardin/` lista los 8 archivos del repo (los 4 del sitio + los 3 `.md` + `README.md`).
 6. Comprobación byte a byte: `Get-FileHash` de `index.html`, `logo.png`, `palmera.png` y `fondo.webp` coincide con el de `SUBIR-A-NETLIFY/`.
+
+---
+
+## 2026-10-29 · T2 — Extraer el CSS a `css/styles.css`
+
+**Estado:** ✅ Completada y verificada por el usuario
+**Rama:** `refactor/t2-css-externo`
+**Commit:** `refactor: extrae el CSS a css/styles.css`
+**Archivos:** `index.html`, `css/styles.css` (nuevo), `TAREAS.md`, `HISTORIAL.md`, `AGENTS.md`
+**Depende de:** T1
+
+### 1. ¿Qué he realizado?
+
+He sacado los 18 KB de CSS que estaban dentro de la etiqueta `<style>` de `index.html` a un archivo propio, `css/styles.css`, y en su lugar he dejado un `<link rel="stylesheet">`. `index.html` pasa de **1.343 a 583 líneas**.
+
+### 2. ¿Por qué?
+
+Tres motivos:
+
+1. **Mantenimiento:** un HTML de 1.343 líneas con 18 KB de estilos en medio es incómodo y propenso a errores.
+2. **Caché:** el CSS ya se puede cachear por separado del HTML.
+3. **El importante — seguridad:** con `<style>` inline no se puede aplicar una CSP estricta, habría que permitir `'unsafe-inline'`, que anula la protección. Ahora, en T14, se podrá poner `style-src 'self'`.
+
+**No es una mejora de velocidad**: pesa exactamente lo mismo y añade una petición. Es la puerta que abre la CSP.
+
+### 3. ¿Dónde verlo en el código?
+
+- `index.html:21` — el `<link rel="stylesheet" href="css/styles.css">`, colocado **justo donde estaba el `<style>`**, para que el orden de la cascada respecto a Google Fonts no cambie.
+- `css/styles.css:1-759` — todo el CSS: `:root` en la línea 7, las 6 `@media` al final, incluida `prefers-reduced-motion`.
+- Se ha quitado solo la **indentación base de 4 espacios**. Valores, orden, selectores y comentarios son idénticos: 651 líneas con contenido en el original y 651 en el archivo nuevo.
+- UTF-8 sin BOM y saltos de línea LF.
+
+### 4. ¿Cómo comprobar que funciona?
+
+1. Abrir `bar-jardin/index.html` y forzar recarga con `Ctrl+F5`: la tarjeta se ve exactamente igual.
+2. Comparar lado a lado con `SUBIR-A-NETLIFY/index.html`: indistinguibles.
+3. `F12` → Elements → en `<head>` está el `<link>` y **ningún** `<style>`.
+4. `F12` → Network → `styles.css` responde 200 (~15,9 KB).
+5. Consola limpia, y los efectos `hover` de Maps/Instagram/Facebook (que usan el CSS nuevo) siguen funcionando.
