@@ -63,6 +63,7 @@ Se añaden además los metadatos de la tarea: estado, rama, commit, archivos toc
 | T9 | Iconos e instalación en el móvil | 2026-10-29 | `feat/t9-iconos` |
 | T10 | Robustez: `localStorage`, portapapeles y `innerHTML` | 2026-10-29 | `fix/t10-robustez` |
 | T11 | Accesibilidad: idioma, `aria` y modal | 2026-10-29 | `feat/t11-accesibilidad` |
+| T12 | Cálculo de horario con `Intl.DateTimeFormat` | 2026-10-29 | `refactor/t12-horario-intl` |
 
 ---
 
@@ -517,3 +518,35 @@ La tarjeta ya se puede usar **sin ratón y con lector de pantalla**: el `<html l
 4. Abrir el modal con teclado: el foco entra; `Tab` va de la ✕ a «Cerrar» y vuelve; `Escape` cierra y devuelve el foco al botón del QR; el fondo no hace scroll.
 5. Copiar el enlace: el toast se anuncia a los lectores de pantalla.
 6. *Verificación automática:* 18 comprobaciones en Node (idioma, `aria-pressed`, apertura, scroll, foco inicial, `Escape`, devolución del foco y trampa de foco en ambos sentidos).
+
+---
+
+## 2026-10-29 · T12 — Cálculo de horario con `Intl.DateTimeFormat`
+
+**Estado:** ✅ Completada y verificada por el usuario
+**Rama:** `refactor/t12-horario-intl`
+**Commit:** `refactor: calcula la hora de Madrid con Intl.DateTimeFormat`
+**Archivos:** `js/horario.js`, `TAREAS.md`
+**Depende de:** T3
+
+### 1. ¿Qué he realizado?
+
+He sustituido el método anterior —`toLocaleString("en-US", { timeZone: "Europe/Madrid" })` y después **volver a construir** una fecha con ese texto— por `Intl.DateTimeFormat` con `formatToParts()`, que devuelve las partes ya convertidas a la zona horaria. El día de la semana se calcula con la fecha ya en Madrid y en UTC.
+
+### 2. ¿Por qué?
+
+Porque el método anterior **parseaba un texto de fecha**, y cómo se interpreta ese texto depende del navegador. Funcionaba, pero era frágil: cualquier cambio en el formato de salida lo rompía en silencio. `formatToParts()` es la API diseñada exactamente para leer la hora en otra zona horaria, sin conversiones implícitas.
+
+`hourCycle: "h23"` está puesto a propósito: evita el clásico fallo de que la medianoche salga como "24" en vez de "00".
+
+### 3. ¿Dónde verlo en el código?
+
+- `js/horario.js:28-36` — `FORMATO_MADRID`, el `Intl.DateTimeFormat` con `timeZone: "Europe/Madrid"` y `hourCycle: "h23"`.
+- `js/horario.js:39-56` — `ahoraEnMadrid()`, que lee las partes y calcula el día de la semana.
+- `js/horario.js:58-78` — `calcularEstadoBar()`, que ahora recibe esos datos en vez de calcularlos.
+
+### 4. ¿Cómo comprobar que funciona?
+
+1. `Ctrl+F5`: el badge debe decir **Abierto** si la hora de Madrid está entre las 16:00 y las 23:00 (o las 00:00 los viernes y sábados), y **Cerrado** fuera de ese tramo.
+2. Si se quiere probar un límite: poner la hora del sistema a las 15:59 → *Cerrado*, a las 16:00 → *Abierto*, y volver a activar la hora automática.
+3. *Verificación automática:* **19 casos en Node inyectando el instante** (sin tocar el reloj) — 12 límites en horario de invierno, 4 en verano y 3 alrededor del cambio de hora. Todos correctos.
