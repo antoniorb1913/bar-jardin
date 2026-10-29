@@ -235,18 +235,19 @@ T0  Documentación
 
 ### T10 · Robustez: `localStorage`, portapapeles y `innerHTML`
 
-- **Estado:** ⏳ Pendiente
+- **Estado:** 👀 Esperando tu OK
 - **Depende de:** T3
-- **Archivos:** `js/i18n.js`, `js/app.js`
+- **Archivos:** `js/i18n.js` (helper `ALMACEN` y `textContent` en el footer), `js/app.js` (`copyCardLink` reescrito)
 - **¿Por qué?**
-  - **Bug real:** la línea 1113 (`let currentLang = localStorage.getItem(...) || "es"`) no tiene `try/catch`. Si el navegador bloquea el almacenamiento (Safari en modo privado, cookies bloqueadas, navegadores dentro de apps), **muere todo el script**: el badge se queda para siempre en *"Consultando..."* y no funcionan ni el QR ni el desplegable.
-  - `document.execCommand("copy")` está **obsoleto**: se sustituye por `navigator.clipboard`, manteniendo el método antiguo como respaldo.
-  - El footer se escribe con `innerHTML`: debe ser `textContent`.
+  - **Bug real:** `let currentLang = localStorage.getItem(...) || "es"` no tenía `try/catch`. Si el navegador bloquea el almacenamiento (Safari en modo privado, cookies bloqueadas, navegadores dentro de apps como Instagram), **moría todo el script**: el badge se quedaba para siempre en *"Consultando..."* y no funcionaban ni el QR ni el desplegable. Y un bar se abre mucho desde el Instagram del bar.
+  - `document.execCommand("copy")` está **obsoleto**: ahora se usa `navigator.clipboard` con el método antiguo como respaldo.
+  - El footer se escribía con `innerHTML`: ahora con `textContent`.
 - **¿Cómo comprobar?**
   1. **Prueba de bloqueo:** en Chrome, Configuración → Privacidad → Cookies → *Bloquear todas* → recargar. La tarjeta debe seguir **completa y funcional**: badge con Abierto/Cerrado (no "Consultando..."), idiomas, drawer, QR y copiar.
   2. Volver a permitir cookies → recargar → el idioma elegido **se recuerda**.
-  3. Pulsar "copiar enlace" → aparece el toast → pegar con `Ctrl+V` en el bloc de notas: la URL es la correcta.
+  3. Pulsar "copiar enlace" → aparece el toast → pegar con `Ctrl+V`: la URL es la correcta.
   4. En consola no hay errores sin capturar.
+  5. *Verificación automática:* 14 comprobaciones en Node, incluida la ejecución con un `localStorage` que **lanza excepción** (arranca, pinta textos, badge correcto, cambio de idioma sin fallar) y las tres vías del portapapeles (API moderna, respaldo y respaldo fallido).
 
 ### T11 · Accesibilidad: idioma, `aria` y modal
 

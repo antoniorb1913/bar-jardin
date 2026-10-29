@@ -57,17 +57,42 @@ function closeQrModal() {
 }
 
 function copyCardLink() {
-  const tempInput = document.createElement("input");
-  tempInput.value = window.location.href;
-  document.body.appendChild(tempInput);
-  tempInput.select();
-  try {
-    document.execCommand("copy");
-    showToast(TRANSLATIONS[currentLang].toastCopy);
-  } catch (e) {
-    showToast(TRANSLATIONS[currentLang].toastError);
+  const enlace = window.location.href;
+
+  // navigator.clipboard es la API actual. Solo existe en contextos seguros
+  // (https o localhost); si no está o falla, se recurre al método antiguo
+  // para que el botón nunca se quede sin respuesta.
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(enlace).then(mostrarCopiado, copiarConSeleccion);
+  } else {
+    copiarConSeleccion(enlace);
   }
-  document.body.removeChild(tempInput);
+}
+
+function mostrarCopiado() {
+  showToast(TRANSLATIONS[currentLang].toastCopy);
+}
+
+function mostrarErrorAlCopiar() {
+  showToast(TRANSLATIONS[currentLang].toastError);
+}
+
+// Respaldo para navegadores sin navigator.clipboard o servidos por http://
+function copiarConSeleccion(texto) {
+  const campo = document.createElement("input");
+  campo.value = typeof texto === "string" ? texto : window.location.href;
+  document.body.appendChild(campo);
+  campo.select();
+  try {
+    if (document.execCommand("copy")) {
+      mostrarCopiado();
+    } else {
+      mostrarErrorAlCopiar();
+    }
+  } catch {
+    mostrarErrorAlCopiar();
+  }
+  document.body.removeChild(campo);
 }
 
 function showToast(message) {
