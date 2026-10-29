@@ -1,0 +1,15 @@
+# Normaliza los finales de línea del repositorio a LF.
+#
+# Sin esto, al guardar en Windows (VS Code, Notepad, etc.) los archivos pasan a
+# CRLF, git los ve como "modificados" y el `git pull` se bloquea con
+# "You have unstaged changes". Con `text=auto eol=lf`, git normaliza siempre:
+# guarda LF en el repositorio y entrega LF en el disco.
+* text=auto eol=lf
+
+# Binarios: git no debe tratarlos como texto ni intentar normalizarlos.
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.webp binary
+*.ico  binary
+*.woff2 binary
