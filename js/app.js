@@ -175,13 +175,20 @@ function prepararFondo() {
   // tarjeta crece después, la máscara del borde inferior hace que la
   // diferencia no se note.
 
-  // Al girar el móvil o cambiar el tamaño de la ventana
+  // Al girar el móvil o cambiar el tamaño de la ventana. Solo se vuelve a
+  // medir si cambia el ANCHO: en el móvil, al esconderse la barra de
+  // direcciones se dispara "resize" sin cambiar el ancho, y re-medir ahí
+  // reescalaría el fondo (el mismo "zoom" que al cambiar de idioma).
+  let anchoPrevio = window.innerWidth;
   let fondoResizeRaf;
   window.addEventListener("resize", function () {
+    if (window.innerWidth === anchoPrevio) return;
+    anchoPrevio = window.innerWidth;
     cancelAnimationFrame(fondoResizeRaf);
     fondoResizeRaf = requestAnimationFrame(congelarFondo);
   });
   window.addEventListener("orientationchange", function () {
+    anchoPrevio = window.innerWidth;
     setTimeout(congelarFondo, 350);
   });
 }
