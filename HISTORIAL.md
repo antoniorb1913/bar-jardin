@@ -61,6 +61,7 @@ Se añaden además los metadatos de la tarea: estado, rama, commit, archivos toc
 | T7 | Quitar el CDN del QR | 2026-10-29 | `perf/t7-qr-local` |
 | T8 | Metadatos para compartir y buscadores | 2026-10-29 | `feat/t8-metadatos` |
 | T9 | Iconos e instalación en el móvil | 2026-10-29 | `feat/t9-iconos` |
+| T10 | Robustez: `localStorage`, portapapeles y `innerHTML` | 2026-10-29 | `fix/t10-robustez` |
 
 ---
 
@@ -443,3 +444,39 @@ He descargado los **mismos archivos `.woff2` que servía Google Fonts**, los he 
 3. Consola: `document.fonts.check('16px Inter')` → `true`.
 4. Abrir el modal QR: carga `cinzel-900.woff2` y el título se ve igual.
 5. **Aviso:** abriendo el archivo con doble clic (`file://`), el navegador marca **CORS** en el `preload` de la fuente y en `manifest.webmanifest`. **No es un fallo:** la fuente se carga igual (aparece otra vez con 200 desde `styles.css`) y el manifest solo se usa al instalar la web. Se comprueba limpio con `python3 -m http.server 8080` y `http://localhost:8080`.
+
+---
+
+## 2026-10-29 · T10 — Robustez: `localStorage`, portapapeles e `innerHTML`
+
+**Estado:** ✅ Completada y verificada por el usuario
+**Rama:** `fix/t10-robustez`
+**Commit:** `fix: evita que la tarjeta se bloquee si el navegador niega el almacenamiento`
+**Archivos:** `js/i18n.js`, `js/app.js`, `TAREAS.md`
+**Depende de:** T3
+
+### 1. ¿Qué he realizado?
+
+He protegido el acceso a `localStorage` con un helper (`ALMACEN`) que captura la excepción, he cambiado el footer de `innerHTML` a `textContent` y he reescrito `copyCardLink` para usar la API moderna `navigator.clipboard`, dejando el método antiguo como respaldo.
+
+### 2. ¿Por qué?
+
+**El bug:** `let currentLang = localStorage.getItem(...) || "es"` se ejecutaba al cargar el script **sin `try/catch`**. Si el navegador niega el almacenamiento —Safari en modo privado, cookies bloqueadas, o el navegador interno de Instagram, Facebook o WhatsApp, que es justo por donde más se abre una tarjeta así— lanzaba una excepción **en la primera línea** y moría todo el script: la tarjeta se quedaba en "Consultando..." para siempre, sin QR y sin desplegable. Un fallo silencioso y bastante probable.
+
+Además, `document.execCommand("copy")` está obsoleto, y escribir el footer con `innerHTML` era incoherente con el resto del código, que usa `textContent` en todo lo demás.
+
+**Degradación intencionada:** si el almacenamiento está bloqueado, la tarjeta funciona completa; simplemente no recuerda el idioma entre visitas.
+
+### 3. ¿Dónde verlo en el código?
+
+- `js/i18n.js` — helper `ALMACEN` con `leer()`/`guardar()` envueltos en `try/catch`; `currentLang` se inicializa con `ALMACEN.leer(...)`; el footer se escribe con `textContent`.
+- `js/app.js` — `copyCardLink()` usa `navigator.clipboard.writeText()` y, si no existe o falla, llama a `copiarConSeleccion()`; `mostrarCopiado()` y `mostrarErrorAlCopiar()` centralizan los mensajes.
+
+### 4. ¿Cómo comprobar que funciona?
+
+1. Abrir la tarjeta con `Ctrl+F5`: todo igual.
+2. **La prueba del bug:** en Chrome, `chrome://settings/cookies` → *Bloquear todas* → recargar. Antes: badge congelado en "Consultando..." y nada funcionaba. Ahora: la tarjeta funciona completa (badge, idiomas, desplegable, QR y copiar).
+3. Volver a permitir las cookies → recargar → el idioma se recuerda otra vez.
+4. «Copiar enlace» → toast → `Ctrl+V` pega la URL.
+5. Consola limpia.
+6. *Verificación automática:* 14 comprobaciones en Node, una de ellas ejecutando el código con un `localStorage` que **lanza excepción**, y las tres vías del portapapeles (API moderna, respaldo y respaldo fallido).

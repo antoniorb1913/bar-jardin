@@ -37,9 +37,9 @@
 | **1** · Estructura | T1 – T3 | 3 / 3 |
 | **2** · Rendimiento y peso | T4 – T7 | 4 / 4 |
 | **3** · Compartir e instalar | T8 – T9 | 2 / 2 |
-| **4** · Robustez y accesibilidad | T10 – T13 | 0 / 4 |
+| **4** · Robustez y accesibilidad | T10 – T13 | 1 / 4 |
 | **5** · Publicación y seguridad | T14 – T15 | 0 / 2 |
-| **TOTAL** | **16 tareas** | **10 / 16** |
+| **TOTAL** | **16 tareas** | **11 / 16** |
 
 ---
 
@@ -235,7 +235,7 @@ T0  Documentación
 
 ### T10 · Robustez: `localStorage`, portapapeles y `innerHTML`
 
-- **Estado:** 👀 Esperando tu OK
+- **Estado:** ✅ Completada (2026-10-29)
 - **Depende de:** T3
 - **Archivos:** `js/i18n.js` (helper `ALMACEN` y `textContent` en el footer), `js/app.js` (`copyCardLink` reescrito)
 - **¿Por qué?**
