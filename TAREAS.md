@@ -251,16 +251,18 @@ T0  Documentación
 
 ### T11 · Accesibilidad: idioma, `aria` y modal
 
-- **Estado:** ⏳ Pendiente
+- **Estado:** 👀 Esperando tu OK
 - **Depende de:** T3
-- **Archivos:** `js/*.js`, `index.html` (atributos)
-- **¿Por qué?** `<html lang="es">` **nunca cambia**: al pasar a inglés o alemán, los lectores de pantalla siguen leyendo con fonética española y Google indexa mal. Además el modal **no se cierra con `Escape`, no atrapa el foco y no bloquea el scroll** del fondo, y el toast no se anuncia.
+- **Archivos:** `js/i18n.js` (`lang` + `aria-pressed`), `js/app.js` (foco, `Escape`, trampa de foco, bloqueo de scroll), `index.html` (3 `aria-pressed` + toast con `role="status"` y `aria-live`), `css/styles.css` (`body.modal-abierto`)
+- **¿Por qué?** `<html lang="es">` **nunca cambiaba**: al pasar a inglés o alemán, los lectores de pantalla seguían leyendo con fonética española y Google indexaba mal. Además el modal **no se cerraba con `Escape`, no atrapaba el foco y no bloqueaba el scroll** del fondo, y el toast no se anunciaba. Para quien navega con teclado o lector de pantalla, el modal era una trampa.
 - **¿Cómo comprobar?**
   1. Cambiar a inglés → DevTools → Elements: `<html lang="en">`. A alemán → `lang="de"`. Volver a español → `es`.
-  2. Navegar con `Tab` hasta las banderas: se ve el foco y `aria-pressed` cambia a `true` en la activa.
-  3. Abrir el modal QR → pulsar `Tab` varias veces: el foco **no sale** del modal. Pulsar `Escape`: se cierra y el foco vuelve al botón del QR. Con el modal abierto, la página del fondo **no hace scroll**.
-  4. El toast tiene `aria-live="polite"` (visible en Elements).
-  5. **Visualmente todo sigue igual.**
+  2. Navegar con `Tab` hasta las banderas: se ve el foco y `aria-pressed` pasa a `true` en la activa y `false` en las demás.
+  3. Abrir el modal QR → pulsar `Tab` varias veces: el foco **no sale** del modal (va de la ✕ al botón «Cerrar» y vuelve). Pulsar `Escape`: se cierra y el foco vuelve al botón del QR.
+  4. Con el modal abierto, intentar hacer scroll del fondo: **no se mueve**.
+  5. El toast tiene `role="status"` y `aria-live="polite"` (visible en Elements).
+  6. **Visualmente todo sigue igual.**
+  7. *Verificación automática:* 18 comprobaciones en Node sobre `lang`, `aria-pressed`, apertura del modal, bloqueo de scroll, foco inicial, `Escape`, devolución del foco y la trampa de foco en ambos sentidos (`Tab` y `Shift+Tab`).
 
 ### T12 · Cálculo de horario con `Intl.DateTimeFormat`
 

@@ -77,7 +77,7 @@
           <div class="langs">
 
             <!-- Bandera España -->
-            <button id="btn-es" title="Español" aria-label="Español" class="lang-btn is-active">
+            <button id="btn-es" title="Español" aria-label="Español" aria-pressed="true" class="lang-btn is-active">
               <svg viewBox="0 0 512 512" aria-hidden="true">
                 <circle cx="256" cy="256" r="256" fill="#c60b1e"/>
                 <path d="M0 160h512v192H0z" fill="#ffc400"/>
@@ -85,7 +85,7 @@
             </button>
 
             <!-- Bandera Reino Unido (Inglés) -->
-            <button id="btn-en" title="English" aria-label="English" class="lang-btn">
+            <button id="btn-en" title="English" aria-label="English" aria-pressed="false" class="lang-btn">
               <svg viewBox="0 0 512 512" aria-hidden="true">
                 <clipPath id="circle-gb"><circle cx="256" cy="256" r="256"/></clipPath>
                 <g clip-path="url(#circle-gb)">
@@ -99,7 +99,7 @@
             </button>
 
             <!-- Bandera Alemania (Alemán) -->
-            <button id="btn-de" title="Deutsch" aria-label="Deutsch" class="lang-btn">
+            <button id="btn-de" title="Deutsch" aria-label="Deutsch" aria-pressed="false" class="lang-btn">
               <svg viewBox="0 0 512 512" aria-hidden="true">
                 <clipPath id="circle-de"><circle cx="256" cy="256" r="256"/></clipPath>
                 <g clip-path="url(#circle-de)">
@@ -312,7 +312,8 @@
   </div>
 
   <!-- Toast -->
-  <div id="toast" class="toast">
+  <!-- role="status" + aria-live: los lectores de pantalla anuncian el mensaje -->
+  <div id="toast" class="toast" role="status" aria-live="polite">
     Enlace copiado al portapapeles
   </div>
 </body>

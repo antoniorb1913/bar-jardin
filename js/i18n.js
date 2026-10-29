@@ -100,9 +100,16 @@ function changeLanguage(lang) {
   currentLang = lang;
   ALMACEN.guardar("bareljardin_lang", lang);
 
-  // Actualizar estilos activos de las banderas
+  // El idioma real del documento: lo usan los lectores de pantalla para
+  // pronunciar bien y los buscadores para indexar en el idioma correcto.
+  document.documentElement.lang = lang;
+
+  // Actualizar estilos activos de las banderas y su estado accesible
   ['es', 'en', 'de'].forEach(l => {
-    document.getElementById(`btn-${l}`).classList.toggle("is-active", l === lang);
+    const boton = document.getElementById(`btn-${l}`);
+    const activo = l === lang;
+    boton.classList.toggle("is-active", activo);
+    boton.setAttribute("aria-pressed", String(activo));
   });
 
   // Actualizar textos en la interfaz
