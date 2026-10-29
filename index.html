@@ -19,6 +19,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
 
   <link rel="stylesheet" href="css/styles.css">
+  <script src="js/i18n.js" defer></script>
+  <script src="js/horario.js" defer></script>
+  <script src="js/app.js" defer></script>
 </head>
 
 <body>
@@ -44,7 +47,7 @@
           <div class="langs">
 
             <!-- Bandera España -->
-            <button onclick="changeLanguage('es')" id="btn-es" title="Español" aria-label="Español" class="lang-btn is-active">
+            <button id="btn-es" title="Español" aria-label="Español" class="lang-btn is-active">
               <svg viewBox="0 0 512 512" aria-hidden="true">
                 <circle cx="256" cy="256" r="256" fill="#c60b1e"/>
                 <path d="M0 160h512v192H0z" fill="#ffc400"/>
@@ -52,7 +55,7 @@
             </button>
 
             <!-- Bandera Reino Unido (Inglés) -->
-            <button onclick="changeLanguage('en')" id="btn-en" title="English" aria-label="English" class="lang-btn">
+            <button id="btn-en" title="English" aria-label="English" class="lang-btn">
               <svg viewBox="0 0 512 512" aria-hidden="true">
                 <clipPath id="circle-gb"><circle cx="256" cy="256" r="256"/></clipPath>
                 <g clip-path="url(#circle-gb)">
@@ -66,7 +69,7 @@
             </button>
 
             <!-- Bandera Alemania (Alemán) -->
-            <button onclick="changeLanguage('de')" id="btn-de" title="Deutsch" aria-label="Deutsch" class="lang-btn">
+            <button id="btn-de" title="Deutsch" aria-label="Deutsch" class="lang-btn">
               <svg viewBox="0 0 512 512" aria-hidden="true">
                 <clipPath id="circle-de"><circle cx="256" cy="256" r="256"/></clipPath>
                 <g clip-path="url(#circle-de)">
@@ -81,12 +84,12 @@
 
           <!-- Acciones Superiores: Copiar enlace y QR -->
           <div class="topbar-actions">
-            <button id="copyBtn" onclick="copyCardLink()" aria-label="Copiar enlace" title="Copiar enlace" class="icon-btn">
+            <button id="copyBtn" aria-label="Copiar enlace" title="Copiar enlace" class="icon-btn">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
               </svg>
             </button>
-            <button onclick="openQrModal()" aria-label="Mostrar Código QR" title="Mostrar código QR" class="icon-btn icon-btn--qr">
+            <button id="qrBtn" aria-label="Mostrar Código QR" title="Mostrar código QR" class="icon-btn icon-btn--qr">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
               </svg>
@@ -130,7 +133,7 @@
 
         <!-- 1. Desplegable Horarios y Ubicación -->
         <div>
-          <button id="btnSchedule" onclick="toggleInfoSection()" aria-expanded="false" aria-controls="infoDrawer" class="hours-btn">
+          <button id="btnSchedule" aria-expanded="false" aria-controls="infoDrawer" class="hours-btn">
             <span class="hours-btn-label">
               <span aria-hidden="true">🕒</span> <span id="txt-btnSchedule">Ver Horarios y Ubicación</span>
             </span>
@@ -259,7 +262,7 @@
   <!-- Modal Emergente QR -->
   <div id="qrModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="qrModalTitle">
     <div class="modal-panel">
-      <button onclick="closeQrModal()" aria-label="Cerrar modal" class="modal-close">
+      <button id="qrCloseIcon" aria-label="Cerrar modal" class="modal-close">
         ✕
       </button>
 
@@ -271,7 +274,7 @@
       </div>
 
       <div class="modal-footer">
-        <button id="txt-qrClose" onclick="closeQrModal()" class="btn-dark">
+        <button id="txt-qrClose" class="btn-dark">
           Cerrar
         </button>
       </div>
@@ -282,302 +285,5 @@
   <div id="toast" class="toast">
     Enlace copiado al portapapeles
   </div>
-
-  <script>
-    /* ==========================================================================
-       1. SISTEMA MULTI-IDIOMA (ESPAÑOL, INGLÉS, ALEMÁN)
-       ========================================================================== */
-    const TRANSLATIONS = {
-      es: {
-        slogan: "Un paraíso en Bolnuevo",
-        howToGet: "¿Cómo llegar?",
-        reviewTitle: "Opiniones en Google",
-        reviewDesc: "Ver reseñas y fotos del bar",
-        btnSchedule: "Ver Horarios y Ubicación",
-        titleSchedule: "🕒 Horario de Apertura",
-        daysSunThu: "Domingo a Jueves:",
-        daysFriSat: "Viernes y Sábados:",
-        timeSunThu: "16:00 - 23:00",
-        timeFriSat: "16:00 - 00:00",
-        locationDesc: "Cerca del Cámping Bolnuevo, Iglesia y acceso desde el Puerto. CP: 30877 Bolnuevo (Mazarrón).",
-        footer: "Bar El Jardín • Bolnuevo • Tarjeta Digital Interactiva",
-        qrDesc: "Escanea con la cámara del móvil para abrir la tarjeta",
-        qrClose: "Cerrar",
-        toastCopy: "¡Enlace copiado al portapapeles!",
-        toastError: "Error al copiar enlace",
-        open: "Abierto",
-        closed: "Cerrado"
-      },
-      en: {
-        slogan: "A paradise in Bolnuevo",
-        howToGet: "How to get there?",
-        reviewTitle: "Google Reviews",
-        reviewDesc: "Check reviews and photos",
-        btnSchedule: "View Opening Hours & Location",
-        titleSchedule: "🕒 Opening Hours",
-        daysSunThu: "Sunday to Thursday:",
-        daysFriSat: "Friday & Saturday:",
-        timeSunThu: "4:00 PM - 11:00 PM",
-        timeFriSat: "4:00 PM - 12:00 AM",
-        locationDesc: "Near Bolnuevo Camping, Church and direct access from the Port. Postal Code: 30877 Bolnuevo (Mazarrón).",
-        footer: "Bar El Jardín • Bolnuevo • Interactive Digital Card",
-        qrDesc: "Scan with your phone camera to open the digital card",
-        qrClose: "Close",
-        toastCopy: "Link copied to clipboard!",
-        toastError: "Error copying link",
-        open: "Open",
-        closed: "Closed"
-      },
-      de: {
-        slogan: "Ein Paradies in Bolnuevo",
-        howToGet: "Anfahrt & Wegbeschreibung",
-        reviewTitle: "Google-Bewertungen",
-        reviewDesc: "Rezensionen & Fotos ansehen",
-        btnSchedule: "Öffnungszeiten & Standort",
-        titleSchedule: "🕒 Öffnungszeiten",
-        daysSunThu: "Sonntag bis Donnerstag:",
-        daysFriSat: "Freitag und Samstag:",
-        timeSunThu: "16:00 - 23:00 Uhr",
-        timeFriSat: "16:00 - 00:00 Uhr",
-        locationDesc: "In der Nähe vom Campingplatz Bolnuevo, Kirche und Hafenzufahrt. PLZ: 30877 Bolnuevo (Mazarrón).",
-        footer: "Bar El Jardín • Bolnuevo • Interaktive Visitenkarte",
-        qrDesc: "Mit der Handykamera scannen, um die Karte zu öffnen",
-        qrClose: "Schließen",
-        toastCopy: "Link in die Zwischenablage kopiert!",
-        toastError: "Fehler beim Kopieren des Links",
-        open: "Geöffnet",
-        closed: "Geschlossen"
-      }
-    };
-
-    let currentLang = localStorage.getItem("bareljardin_lang") || "es";
-
-    function changeLanguage(lang) {
-      currentLang = lang;
-      localStorage.setItem("bareljardin_lang", lang);
-
-      // Actualizar estilos activos de las banderas
-      ['es', 'en', 'de'].forEach(l => {
-        document.getElementById(`btn-${l}`).classList.toggle("is-active", l === lang);
-      });
-
-      // Actualizar textos en la interfaz
-      const t = TRANSLATIONS[lang];
-      document.getElementById("txt-slogan").textContent = t.slogan;
-      document.getElementById("txt-howToGet").textContent = t.howToGet;
-      document.getElementById("txt-reviewTitle").textContent = t.reviewTitle;
-      document.getElementById("txt-reviewDesc").textContent = t.reviewDesc;
-      document.getElementById("txt-btnSchedule").textContent = t.btnSchedule;
-      document.getElementById("txt-titleSchedule").textContent = t.titleSchedule;
-      document.getElementById("txt-daysSunThu").textContent = t.daysSunThu;
-      document.getElementById("txt-daysFriSat").textContent = t.daysFriSat;
-      document.getElementById("txt-timeSunThu").textContent = t.timeSunThu;
-      document.getElementById("txt-timeFriSat").textContent = t.timeFriSat;
-      document.getElementById("txt-locationDesc").textContent = t.locationDesc;
-      document.getElementById("txt-footer").innerHTML = t.footer;
-      document.getElementById("txt-qrDesc").textContent = t.qrDesc;
-      document.getElementById("txt-qrClose").textContent = t.qrClose;
-
-      // Actualizar estado abierto/cerrado con el nuevo idioma
-      calcularEstadoBar();
-
-      // Si la traducción cambia el alto de la tarjeta, reajustar el fondo
-      if (fondoIniciado) congelarFondo();
-    }
-
-    /* ==========================================================================
-       2. CÁLCULO EN TIEMPO REAL (Mantiene la lógica interna 24h española):
-          - Domingo a Jueves: 16:00 a 23:00
-          - Viernes y Sábados: 16:00 a 00:00 (24h)
-          (Hora Peninsular Española)
-       ========================================================================== */
-    const HORARIOS = {
-      0: [{ abre: 16, cierra: 23 }], // Domingo
-      1: [{ abre: 16, cierra: 23 }], // Lunes
-      2: [{ abre: 16, cierra: 23 }], // Martes
-      3: [{ abre: 16, cierra: 23 }], // Miércoles
-      4: [{ abre: 16, cierra: 23 }], // Jueves
-      5: [{ abre: 16, cierra: 24 }], // Viernes: hasta 00:00
-      6: [{ abre: 16, cierra: 24 }]  // Sábado: hasta 00:00
-    };
-
-    let isBarOpen = false;
-
-    function calcularEstadoBar() {
-      const ahora = new Date();
-      const horaEspanaStr = ahora.toLocaleString("en-US", { timeZone: "Europe/Madrid" });
-      const fechaEspana = new Date(horaEspanaStr);
-
-      const diaSemana = fechaEspana.getDay();
-      const horas = fechaEspana.getHours();
-      const minutos = fechaEspana.getMinutes();
-      const horaActualDecimal = horas + (minutos / 60);
-
-      isBarOpen = false;
-      const turnosHoy = HORARIOS[diaSemana];
-
-      if (turnosHoy) {
-        for (const turno of turnosHoy) {
-          if (horaActualDecimal >= turno.abre && horaActualDecimal < turno.cierra) {
-            isBarOpen = true;
-            break;
-          }
-        }
-      }
-
-      actualizarBadge(isBarOpen);
-    }
-
-    function actualizarBadge(abierto) {
-      const badge = document.getElementById("badgeEstado");
-      const texto = document.getElementById("badgeTexto");
-      const t = TRANSLATIONS[currentLang];
-
-      badge.classList.toggle("is-open", abierto);
-      texto.textContent = abierto ? t.open : t.closed;
-    }
-
-    // Inicializar idioma y estado
-    changeLanguage(currentLang);
-    setInterval(calcularEstadoBar, 60000);
-
-    /* ==========================================================================
-       3. MODAL QR Y ACCIONES
-       ========================================================================== */
-    function toggleInfoSection() {
-      const drawer = document.getElementById("infoDrawer");
-      const icon = document.getElementById("chevronIcon");
-      const boton = document.getElementById("btnSchedule");
-
-      // toggle() devuelve true cuando acaba de añadir "hidden" (es decir, al cerrar)
-      const cerrado = drawer.classList.toggle("hidden");
-
-      icon.classList.toggle("is-open", !cerrado);
-      boton.setAttribute("aria-expanded", String(!cerrado));
-
-      // Al cerrar el desplegable la tarjeta vuelve a su alto original:
-      // se recalcula el fondo con ese alto
-      if (cerrado) congelarFondo();
-    }
-
-    let qrGenerated = false;
-    function openQrModal() {
-      const modal = document.getElementById("qrModal");
-
-      // La librería del QR se carga con defer: si aún no ha llegado,
-      // se abre el modal en cuanto el navegador la tenga lista
-      if (!qrGenerated && typeof QRCode === "undefined") {
-        window.addEventListener("load", openQrModal, { once: true });
-        return;
-      }
-
-      modal.classList.remove("hidden");
-
-      if (!qrGenerated) {
-        const qrContainer = document.getElementById("qrcodeCanvas");
-        qrContainer.innerHTML = "";
-        const currentUrl = window.location.href.startsWith("http") ? window.location.href : "https://maps.google.com/?q=Avda.+Antonio+Segado+del+Olmo,+19,+30877+Bolnuevo,+Murcia";
-
-        new QRCode(qrContainer, {
-          text: currentUrl,
-          width: 180,
-          height: 180,
-          colorDark: "#1c1917",
-          colorLight: "#fafaf9",
-          correctLevel: QRCode.CorrectLevel.M
-        });
-        qrGenerated = true;
-      }
-    }
-
-    function closeQrModal() {
-      document.getElementById("qrModal").classList.add("hidden");
-    }
-
-    function copyCardLink() {
-      const tempInput = document.createElement("input");
-      tempInput.value = window.location.href;
-      document.body.appendChild(tempInput);
-      tempInput.select();
-      try {
-        document.execCommand("copy");
-        showToast(TRANSLATIONS[currentLang].toastCopy);
-      } catch (e) {
-        showToast(TRANSLATIONS[currentLang].toastError);
-      }
-      document.body.removeChild(tempInput);
-    }
-
-    function showToast(message) {
-      const toast = document.getElementById("toast");
-      toast.textContent = message;
-      toast.classList.add("is-visible");
-      setTimeout(() => {
-        toast.classList.remove("is-visible");
-      }, 2500);
-    }
-
-    window.addEventListener("click", function(event) {
-      const modal = document.getElementById("qrModal");
-      if (event.target === modal) closeQrModal();
-    });
-
-    /* ==========================================================================
-       4. FONDO ESTÁTICO (SIN "ZOOM" AL DESPLEGAR EL HORARIO)
-       La capa del fondo ocupa la tarjeta completa. Cuando se abre el
-       desplegable, la tarjeta crece en alto y la imagen, al ser
-       object-fit: cover + height: 100%, tenía que reescalarse para seguir
-       cubriendo: eso era el "zoom".
-       Solución: se mide la altura de la tarjeta CON el desplegable cerrado
-       y se fija en la capa del fondo. La tarjeta puede crecer libremente,
-       la imagen ya no cambia de tamaño.
-       ========================================================================== */
-    var fondoIniciado = false;
-
-    function congelarFondo() {
-      const capa = document.getElementById("bgLayer");
-      const tarjeta = document.querySelector("main");
-      const cajon = document.getElementById("infoDrawer");
-      if (!capa || !tarjeta || !cajon) return;
-
-      // Con el desplegable abierto la tarjeta está más alta: no se mide
-      if (!cajon.classList.contains("hidden")) return;
-
-      const alto = tarjeta.clientHeight;
-      if (!alto) return;
-
-      capa.style.height = alto + "px";
-      fondoIniciado = true;
-    }
-
-    // Primer cálculo + repeticiones (las fuentes web pueden terminar de
-    // aplicarse después y cambiar el alto real de la tarjeta)
-    congelarFondo();
-    requestAnimationFrame(function () {
-      congelarFondo();
-      requestAnimationFrame(congelarFondo);
-    });
-    window.addEventListener("load", congelarFondo);
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(congelarFondo);
-    }
-
-    // Si la tarjeta cambia de alto por cualquier motivo (imágenes, idioma,
-    // textos), se vuelve a congelar. Mientras el desplegable está abierto
-    // la función sale sin hacer nada.
-    if (window.ResizeObserver) {
-      new ResizeObserver(congelarFondo).observe(document.querySelector("main"));
-    }
-
-    // Al girar el móvil o cambiar el tamaño de la ventana
-    let fondoResizeRaf;
-    window.addEventListener("resize", function () {
-      cancelAnimationFrame(fondoResizeRaf);
-      fondoResizeRaf = requestAnimationFrame(congelarFondo);
-    });
-    window.addEventListener("orientationchange", function () {
-      setTimeout(congelarFondo, 350);
-    });
-  </script>
 </body>
 </html>
