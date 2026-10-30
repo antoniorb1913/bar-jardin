@@ -50,8 +50,8 @@ Netlify sirve **la raíz del repositorio tal cual, sin build**. Dos archivos lo 
 ## Documentación del proyecto
 
 - [`AGENTS.md`](AGENTS.md) — reglas de trabajo, stack permitido y convenciones.
-- [`TAREAS.md`](TAREAS.md) — las 16 tareas del proyecto y su estado.
-- [`HISTORIAL.md`](HISTORIAL.md) — registro de cada tarea completada.
+- [`documentation/TAREAS.md`](TAREAS.md) — las 16 tareas del proyecto y su estado.
+- [`documentation/HISTORIAL.md`](HISTORIAL.md) — registro de cada tarea completada.
 
 ## Tecnología
 
