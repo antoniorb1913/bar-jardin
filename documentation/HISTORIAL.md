@@ -66,6 +66,7 @@ Se añaden además los metadatos de la tarea: estado, rama, commit, archivos toc
 | T12 | Cálculo de horario con `Intl.DateTimeFormat` | 2026-10-29 | `refactor/t12-horario-intl` |
 | T13 | Imágenes sin salto de layout | 2026-10-29 | `perf/t13-imagenes-sin-salto` |
 | T14 | Configuración de Netlify y cabeceras de seguridad | 2026-10-29 | `feat/t14-seguridad-netlify` |
+| T15 | Verificación final integral | 2026-10-29 | `docs/t15-verificacion-final` |
 
 ---
 
@@ -625,3 +626,40 @@ Además: sin cabeceras, el navegador no sabe que el sitio no debe enmarcarse, qu
 6. El sitio funciona exactamente igual.
 
 *Verificación local hecha:* la CSP cubre los 4 scripts, la hoja de estilos, las 3 imágenes, las 2 fuentes y el `data:` del QR; ni el código propio ni la librería del QR usan `eval`, `new Function` ni estilos en línea.
+
+---
+
+## 2026-10-29 · T15 — Verificación final integral
+
+**Estado:** ✅ Completada y verificada por el usuario
+**Ramas:** `docs/t15-verificacion-final`, `fix/t15-fondo-sin-zoom`, `fix/fondo-ancho`
+**Archivos:** `TAREAS.md`, `HISTORIAL.md`, `js/app.js`, `js/i18n.js`
+**Depende de:** todas las anteriores
+
+### 1. ¿Qué he realizado?
+
+Dos cosas: **(1)** una auditoría automática de todo el proyecto, y **(2)** corregir un fallo visual que apareció al revisar: al cambiar a alemán, el fondo de la tarjeta se reescalaba ("zoom").
+
+La auditoría comprobó: los 31 archivos esperados, los 29 `id` que usa el JavaScript (todos existen en el HTML), las 13 rutas de `index.html`, los 6 `url()` del CSS, los iconos del manifest, cero `onclick`/`<style>`/`style=`, cero `eval`, cero recursos de dominios ajenos, los 3 idiomas con las mismas 18 claves, las dimensiones de las imágenes y la sintaxis de los 4 archivos JS.
+
+### 2. ¿Por qué?
+
+Una tarea de verificación es la única que mira el **conjunto** y no las piezas: hasta aquí, cada tarea se había probado aislada. Y el fallo del fondo no lo detectaba ninguna prueba automática porque **solo se ve en el móvil al cambiar de idioma**.
+
+**La causa del zoom, en realidad, eran dos:**
+1. `congelarFondo()` se llamaba al cambiar de idioma, y un `ResizeObserver` re-medía con cualquier cambio de altura de la tarjeta. El alemán es más largo → la tarjeta crece → la capa del fondo crece → la imagen (`object-fit: cover`) se reescala.
+2. En el móvil, al alargarse la página el navegador esconde la barra de direcciones, lo que dispara `resize` → se volvía a medir → mismo efecto.
+
+### 3. ¿Dónde verlo en el código?
+
+- `js/app.js` — el fondo se mide en: arranque, `load`, `fonts.ready`, cambio de **ancho** de ventana y `orientationchange`. Se eliminó el `ResizeObserver` y el gestor de `resize` ahora ignora los cambios que no sean de ancho (`anchoPrevio`).
+- `js/i18n.js` — `changeLanguage()` ya **no** reajusta el fondo, con el comentario explicando por qué.
+- `js/app.js` — eliminada la variable `fondoIniciado`, que quedaba sin uso.
+
+### 4. ¿Cómo comprobar que funciona?
+
+1. En el móvil, con recarga forzada: cambiar **ES → DE → EN**. El **fondo no debe cambiar de tamaño**; la tarjeta sí se hace más alta en alemán (el texto es más largo), y eso es normal.
+2. Abrir y cerrar el desplegable de horarios: el fondo **no** debe hacer zoom (comportamiento de siempre).
+3. Girar el móvil: el fondo debe re-medirse y seguir cubriendo la tarjeta.
+4. Comprobar en la web publicada que `js/app.js` contiene `anchoPrevio`.
+5. *Verificación automática:* 17 comprobaciones en Node (auditoría del proyecto y, sobre el fondo, simulando el alemán más alto, el `resize` sin cambio de ancho, el giro y el desplegable).

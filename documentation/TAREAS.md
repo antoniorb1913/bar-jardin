@@ -38,8 +38,8 @@
 | **2** · Rendimiento y peso | T4 – T7 | 4 / 4 |
 | **3** · Compartir e instalar | T8 – T9 | 2 / 2 |
 | **4** · Robustez y accesibilidad | T10 – T13 | 4 / 4 |
-| **5** · Publicación y seguridad | T14 – T15 | 1 / 2 |
-| **TOTAL** | **16 tareas** | **15 / 16** |
+| **5** · Publicación y seguridad | T14 – T15 | 2 / 2 |
+| **TOTAL** | **16 tareas** | **16 / 16** |
 
 ---
 
@@ -320,7 +320,7 @@ T0  Documentación
 
 ### T15 · Verificación final integral
 
-- **Estado:** 👀 Esperando tu OK
+- **Estado:** ✅ Completada (2026-10-29)
 - **Depende de:** todas las anteriores
 - **Archivos:** ninguno (solo verificación; se corrigen detalles si aparecen)
 - **¿Por qué?** Lo último que se revisa son las **piezas sueltas**, no el conjunto. Esta tarea comprueba que la suma de todos los cambios no ha roto nada, comparando contra la versión original.
